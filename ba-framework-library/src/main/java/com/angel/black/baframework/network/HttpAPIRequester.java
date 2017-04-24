@@ -8,7 +8,7 @@ import com.angel.black.baframework.core.base.BaseActivity;
 import com.angel.black.baframework.core.base.BaseFragment;
 import com.angel.black.baframework.core.base.BaseListActivity;
 import com.angel.black.baframework.logger.BaLog;
-import com.angel.black.baframework.network.util.NetworkUtil;
+import com.angel.black.baframework.util.NetworkUtil;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;

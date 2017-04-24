@@ -39,14 +39,14 @@ version = '1.0.0'
 install {
     repositories.mavenInstaller {
         pom.project {
-            name 'ba-framework'
-            description 'This is ba-framework'
+            name 'ba-framework-library'
+            description 'This is ba-framework library'
             url 'https://github.com/black2602/ba-framework'
             inceptionYear '2017'
 
             packaging 'aar'
             groupId 'com.angel.black'
-            artifactId 'ba-framework'
+            artifactId 'ba-framework-library'
             version '1.0.0'
 
             licenses {
@@ -79,7 +79,7 @@ bintray {
 
     pkg {
         repo = 'maven'
-        name = 'ba-framework'
+        name = 'ba-framework-library'
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/black2602/ba-framework'
         version {
