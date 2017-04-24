@@ -9,11 +9,14 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.v4.content.IntentCompat;
 import android.widget.Toast;
 
+import com.angel.black.baframework.R;
 import com.angel.black.baframework.logger.BaLog;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -219,5 +222,24 @@ public class BaPackageManager {
         Intent mainIntent = IntentCompat.makeRestartActivityTask(componentName);
         context.startActivity(mainIntent);
         System.exit(0);
+    }
+
+    public static String getPublicAppAlbumPath(Context context) {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/" + getPublicAppAlbumName(context) + "/";
+    }
+
+    public static String getPublicAppAlbumName(Context mContext) {
+        return mContext.getString(R.string.app_name);
+    }
+
+    public static String getTempImagePath(Context context) {
+        String tempPath = context.getFilesDir().getAbsolutePath() + "/temp/";
+
+        File tempDir = new File(tempPath);
+        if(!tempDir.exists()) {
+            tempDir.mkdir();
+        }
+
+        return tempDir.getAbsolutePath();
     }
 }
