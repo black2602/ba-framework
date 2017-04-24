@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BAFramework.iml" filepath="$PROJECT_DIR$/BAFramework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ba-framework.iml" filepath="$PROJECT_DIR$/ba-framework.iml" />
       <module fileurl="file://$PROJECT_DIR$/ba-framework/ba-framework.iml" filepath="$PROJECT_DIR$/ba-framework/ba-framework.iml" />
     </modules>
   </component>
