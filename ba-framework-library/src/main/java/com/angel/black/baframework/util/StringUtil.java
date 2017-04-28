@@ -106,6 +106,13 @@ public class StringUtil {
         return phoneNum;
     }
 
+    /**
+     * 텍스트에서 숫자만 뽑아낸다.
+     */
+    public static long getfilteredNumber(String text) {
+        return IntegerUtil.getInt(text.replaceAll("\\D", ""), 0);
+    }
+
     public static class RegularExpressions {
         int LENGTH_resRegNo = 13;
         /** 메일주소 인것 */
