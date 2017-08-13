@@ -1,6 +1,7 @@
 package com.angel.black.baframework.core.base;
 
 import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +28,8 @@ import com.angel.black.baframework.preference.MyPreferenceManager;
 import com.angel.black.baframework.ui.dialog.AlertDialogFragment;
 import com.angel.black.baframework.ui.dialog.DialogClickListener;
 import com.angel.black.baframework.ui.dialog.PermissionConfirmationDialog;
+import com.angel.black.baframework.ui.dialog.custom.CustomDialogFragment;
+import com.angel.black.baframework.ui.dialog.custom.DialogItems;
 
 /**
  * Created by KimJeongHun on 2016-05-19.
@@ -123,13 +126,24 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         ft.commitAllowingStateLoss();
     }
 
-    protected void removeFragment(String tag) {
+    public void removeFragment(String tag) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 //		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
 //        ft.setCustomAnimations(R.anim.slide_down_to_up, R.anim.slide_up_to_down);
         ft.remove(fm.findFragmentByTag(tag));
         ft.commitAllowingStateLoss();
+    }
+
+    public void removeFragment(Fragment fragment) {
+        FragmentManager fm = getSupportFragmentManager();
+
+        if(fragment != null) {
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+            ft.remove(fragment);
+            ft.commitAllowingStateLoss();
+        }
     }
 
     protected void startActivity(Class clazz) {
@@ -183,12 +197,103 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         showDialogFragment(dialogFragment, "altDlgWithPosiNotCancel");
     }
 
+    public void showAlertDialog(int msgResId) {
+        showAlertDialog(getString(msgResId), null);
+    }
+
+    public void showAlertDialog(String msg) {
+        showAlertDialog(msg, null);
+    }
+
+
     private void showDialogFragment(DialogFragment dialogFragment, String tag) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 
         ft.add(dialogFragment, tag);
         ft.commitAllowingStateLoss();
+    }
+
+
+    public void showCustomDialog(DialogItems dialogItems) {
+        this.showCustomDialog(dialogItems, CustomDialogFragment.TAG);
+    }
+
+    public void showCustomDialog(DialogItems dialogItems, String tag) {
+        if(!isFinishing()) {
+            CustomDialogFragment customDialog;
+
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+
+            Fragment prev = fm.findFragmentByTag(tag);
+            if(prev != null) {
+                removeCustomDialog();
+            }
+
+            customDialog = CustomDialogFragment.newInstance(dialogItems);
+            ft.add(customDialog, tag);
+            ft.commitAllowingStateLoss();
+        }
+    }
+
+
+    public void showCustomDialog(DialogItems dialogItems, String tag, DialogInterface.OnDismissListener onDismissListener) {
+        if(!isFinishing()) {
+            CustomDialogFragment customDialog;
+
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+
+            Fragment prev = fm.findFragmentByTag(tag);
+            if(prev != null) {
+                removeCustomDialog();
+            }
+
+            customDialog = CustomDialogFragment.newInstance(dialogItems);
+            customDialog.setOnDismissListener(onDismissListener);
+
+            ft.add(customDialog, tag);
+            ft.commitAllowingStateLoss();
+        }
+    }
+
+    public void showCustomDialog(CustomDialogFragment customDialogFragment) {
+        showCustomDialog(customDialogFragment, customDialogFragment.getClass().getSimpleName());
+    }
+
+    public void showCustomDialog(CustomDialogFragment customDialogFragment, String tag) {
+        if(!isFinishing()) {
+
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+
+            Fragment prev = fm.findFragmentByTag(tag);
+            if(prev != null) {
+                removeCustomDialog();
+            }
+
+            ft.add(customDialogFragment, tag);
+            ft.commitAllowingStateLoss();
+        }
+    }
+
+    public void removeCustomDialog() {
+        this.removeCustomDialog(CustomDialogFragment.TAG);
+    }
+
+    public void removeCustomDialog(String tag) {
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment prev = fm.findFragmentByTag(tag);
+
+        if (prev != null) {
+            CustomDialogFragment customDialog = (CustomDialogFragment) prev;
+            try {
+                customDialog.dismiss();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void showToast(String message) {

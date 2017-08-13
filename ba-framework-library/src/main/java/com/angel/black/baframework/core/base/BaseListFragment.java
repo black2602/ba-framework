@@ -8,11 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.angel.black.baframework.R;
 import com.angel.black.baframework.logger.BaLog;
 import com.angel.black.baframework.ui.view.recyclerview.AbsRecyclerViewHolder;
-import com.angel.black.baframework.ui.view.recyclerview.RecyclerViewAdapterData;
+import com.angel.black.baframework.ui.view.recyclerview.RecyclerViewAdapterHelper;
+
+import java.util.List;
 
 /**
  * Created by KimJeongHun on 2016-09-11.
@@ -23,7 +26,8 @@ public abstract class BaseListFragment extends BaseFragment {
     protected RecyclerView mRecyclerView;
     protected MyRecyclerViewAdapter mRecyclerViewAdapter;
     protected LinearLayoutManager mLayoutManager;
-    protected View mLoadingFooterView;
+    protected ViewGroup mEmptyView;
+    protected View.OnClickListener mOnRowClickListener;
 
     protected int mCurPage = 1;
     protected int mCurItemCount = 0;    // 리스트의 현재까지 페이징 된 아이템 갯수
@@ -31,15 +35,27 @@ public abstract class BaseListFragment extends BaseFragment {
 
     protected boolean isCanLoadMore = true;
 
-    public abstract void requestList();
+    public abstract void requestList(boolean showOutProgress);
     protected abstract MyRecyclerViewAdapter createListAdapter();
+
+    /**
+     * RecyclerView 에 추가로 데코레이션 한다.
+     * Divider, Padding 설정 등
+     */
+    protected abstract void addRecyclerViewDecoration(RecyclerView recyclerView);
+
+    public void setOnRowClickListener(View.OnClickListener onRowClickListener) {
+        mOnRowClickListener = onRowClickListener;
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        BaLog.i();
         View view = inflater.inflate(R.layout.fragment_base_list, container, false);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        mEmptyView = (ViewGroup) view.findViewById(R.id.layout_empty_view);
         mRecyclerView.setHasFixedSize(true);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -51,13 +67,25 @@ public abstract class BaseListFragment extends BaseFragment {
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
         mRecyclerView.addOnScrollListener(new MyScrollListener());
 
-        mLoadingFooterView = inflater.inflate(R.layout.loading_progress, null);
+        addRecyclerViewDecoration(mRecyclerView);
 
         return view;
     }
 
     protected void showEmptyLayout() {
+        if(mEmptyView.getChildCount() == 0) {
+            mEmptyView.addView(createEmptyView());
+        }
 
+        mEmptyView.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
+    }
+
+    protected View createEmptyView() {
+        TextView textView = new TextView(getContext());
+        textView.setText(R.string.empty_data);
+
+        return textView;
     }
 
     public void showLoadingFooter() {
@@ -70,11 +98,13 @@ public abstract class BaseListFragment extends BaseFragment {
 
     protected void loadMore() {
         mCurPage++;
-        requestList();
+
+        // 하단 프로그레스바 추가
+        showLoadingFooter();
+        requestList(true);
     }
 
-
-    protected void setPagination(int totalCount) {
+    protected void setTotalItemCount(int totalCount) {
         mTotalItemCount = totalCount;
 
         BaLog.d("mCurItemCount=" + mCurItemCount + ", mCurPage=" + mCurPage + ", mTotalItemCount=" + mTotalItemCount);
@@ -86,10 +116,48 @@ public abstract class BaseListFragment extends BaseFragment {
         mCurItemCount = 0;
     }
 
-    public class MyRecyclerViewAdapterWithHeader extends MyRecyclerViewAdapter {
+    public void setLoadComplete() {
+        isCanLoadMore = true;
+    }
 
-        public MyRecyclerViewAdapterWithHeader(RecyclerViewAdapterData recyclerViewAdapterData) {
-            super(recyclerViewAdapterData);
+    public void populateList(List<?> dataset) {
+        boolean noData = dataset == null || dataset.size() == 0;
+
+        if(noData) {
+            noDataLoaded(mCurPage == 1);
+
+            if(mCurPage > 1)
+                hideLoadingFooter();
+
+        } else {
+
+            if(mEmptyView.getVisibility() == View.VISIBLE) {
+                mEmptyView.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+            }
+
+            if (mCurPage > 1) {
+                hideLoadingFooter();
+                mRecyclerViewAdapter.addDataset(dataset);
+            } else {
+                mRecyclerViewAdapter.setDataset(dataset);
+            }
+
+            mCurItemCount += dataset.size();
+
+            setLoadComplete();
+        }
+    }
+
+    protected abstract void noDataLoaded(boolean firstPage);
+
+    /**
+     * 상단에 헤더뷰를 포함하여 표현하는 커스텀 RecyclerView 어댑터
+     */
+    public abstract class MyRecyclerViewAdapterWithHeader extends MyRecyclerViewAdapter {
+
+        public MyRecyclerViewAdapterWithHeader(RecyclerViewAdapterHelper recyclerViewAdapterHelper) {
+            super(recyclerViewAdapterHelper);
         }
 
         @Override
@@ -109,7 +177,7 @@ public abstract class BaseListFragment extends BaseFragment {
             } else if(holder instanceof ProgressViewHolder) {
                 super.onBindViewHolder(holder, position);
             } else {
-                mRecyclerViewAdapterData.onBindViewHolder(holder, position, mDataset.getData(position - 1));
+                mRecyclerViewAdapterHelper.onBindViewHolder(holder, position, mDataset.getData(position - 1));
             }
         }
 
@@ -139,47 +207,53 @@ public abstract class BaseListFragment extends BaseFragment {
             notifyItemRemoved(getItemCount());
         }
 
+        public abstract void bindHeaderView();
+
+        public abstract View createHeaderView(ViewGroup parent);
     }
 
+    /**
+     * 헤더 뷰 없는 기본적인 커스텀 RecyclerView 어댑터
+     */
     public class MyRecyclerViewAdapter extends RecyclerView.Adapter<AbsRecyclerViewHolder> {
-        protected final int VIEW_TYPE_HEADER = 0;
-        protected final int VIEW_TYPE_ITEM = 1;
-        protected final int VIEW_TYPE_LOADING = 2;
+        final int VIEW_TYPE_HEADER = 0;
+        final int VIEW_TYPE_ITEM = 1;
+        final int VIEW_TYPE_LOADING = 2;
 
-        protected RecyclerViewAdapterData.RecyclerViewColletionData mDataset;
-        protected RecyclerViewAdapterData mRecyclerViewAdapterData;
+        RecyclerViewAdapterHelper.RecyclerViewColletionData mDataset;
+        RecyclerViewAdapterHelper mRecyclerViewAdapterHelper;
 
-        public MyRecyclerViewAdapter(RecyclerViewAdapterData recyclerViewAdapterData) {
-            this.mRecyclerViewAdapterData = recyclerViewAdapterData;
-            this.mDataset = mRecyclerViewAdapterData.provideData();
+        public MyRecyclerViewAdapter(RecyclerViewAdapterHelper recyclerViewAdapterHelper) {
+            this.mRecyclerViewAdapterHelper = recyclerViewAdapterHelper;
+            this.mDataset = mRecyclerViewAdapterHelper.provideData();
         }
 
-        public RecyclerViewAdapterData.RecyclerViewColletionData getDataset() {
+        public RecyclerViewAdapterHelper.RecyclerViewColletionData getDataset() {
             return mDataset;
         }
 
-        public void setDataset(Object dataset) {
+        void setDataset(Object dataset) {
             BaLog.i();
             mDataset.setDataset(dataset);
             notifyDataSetChanged();
         }
 
-        public class ProgressViewHolder extends AbsRecyclerViewHolder {
-            public ProgressBar progressBar;
+        class ProgressViewHolder extends AbsRecyclerViewHolder {
+            ProgressBar progressBar;
 
-            public ProgressViewHolder(View v) {
+            ProgressViewHolder(View v) {
                 super(v);
                 progressBar = (ProgressBar) v.findViewById(R.id.loading_progress);
             }
         }
 
-        public class HeaderViewHolder extends AbsRecyclerViewHolder {
-            public HeaderViewHolder(View v) {
+        class HeaderViewHolder extends AbsRecyclerViewHolder {
+            HeaderViewHolder(View v) {
                 super(v);
             }
         }
 
-        public void addDataset(Object dataset) {
+        void addDataset(Object dataset) {
             BaLog.i();
             int itemCount = mDataset.addDataset(dataset);
             notifyItemRangeInserted(mCurItemCount + 1, itemCount);
@@ -202,12 +276,12 @@ public abstract class BaseListFragment extends BaseFragment {
 
         @Override
         public AbsRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            BaLog.i();
             AbsRecyclerViewHolder vh = null;
             if(viewType == VIEW_TYPE_ITEM) {
-                vh = mRecyclerViewAdapterData.createViewHolder(parent);
+                vh = mRecyclerViewAdapterHelper.createViewHolder(parent);
             } else {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.loading_list_footer, parent, false);
+                // 로딩 뷰
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.loading_progress, parent, false);
                 vh = new ProgressViewHolder(view);
             }
 
@@ -220,7 +294,7 @@ public abstract class BaseListFragment extends BaseFragment {
                 ProgressViewHolder loadingViewHolder = (ProgressViewHolder) holder;
                 loadingViewHolder.progressBar.setIndeterminate(true);
             } else {
-                mRecyclerViewAdapterData.onBindViewHolder(holder, position, mDataset.getData(position));
+                mRecyclerViewAdapterHelper.onBindViewHolder(holder, position, mDataset.getData(position));
             }
         }
 
@@ -235,11 +309,9 @@ public abstract class BaseListFragment extends BaseFragment {
         }
     }
 
-    protected abstract void bindHeaderView();
 
-    protected abstract View createHeaderView(ViewGroup parent);
 
-    class MyScrollListener extends RecyclerView.OnScrollListener {
+    private class MyScrollListener extends RecyclerView.OnScrollListener {
         private int pastVisiblesItems, visibleItemCount, totalItemCount;
 
         @Override

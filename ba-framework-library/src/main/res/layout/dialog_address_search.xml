@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp" >
+        
+		<TextView
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/guide_search_addr" />
+		
+		<LinearLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="40dp"
+			android:layout_marginTop="16dp"
+		    android:orientation="horizontal">
+		    
+	        <EditText
+	            style="@style/MainEditText"
+	            android:id="@+id/edit_search_data"
+	            android:layout_width="0dp"
+	            android:layout_height="match_parent"
+	            android:layout_weight="1"
+	            android:singleLine="true"
+				android:imeOptions="actionSearch"
+				android:hint="@string/hint_input_search_keyword"/>
+	
+	        <Button
+				style="@style/MainButton"
+	            android:id="@+id/button_address_search"
+	            android:layout_width="70dp"
+	            android:layout_height="match_parent"
+	            android:text="@android:string/search_go" />
+		</LinearLayout>	
+	 </LinearLayout>
+
+	<FrameLayout
+		android:id="@+id/container_addr_search_fragment"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<fragment
+			android:id="@+id/fragment_addr_search"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:name="com.angel.black.baframework.module.AddressSearcher$AddressSearchFragment"
+			android:tag="fragAddrSearch"/>
+
+	</FrameLayout>
+
+    
+</LinearLayout>

@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +30,8 @@ import android.widget.TextView;
 
 import com.angel.black.baframework.R;
 import com.angel.black.baframework.logger.BaLog;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
@@ -54,24 +57,28 @@ public class ViewUtil {
             public void afterTextChanged(Editable s) {
                 BaLog.i();
 
-                String str = s.toString();
-                if(str.length() > 0 && !str.equals(mPrevText)) {
-                    if (StringUtil.isCellPhoneWithDash(str)) {
-                        if(str.endsWith("-")) {
-                            s.delete(s.length() - 1, s.length());
-                            return;
-                        }
+                try {
+                    String str = s.toString();
+                    if (str.length() > 0 && !str.equals(mPrevText)) {
+                        if (StringUtil.isCellPhoneWithDash(str)) {
+                            if (str.endsWith("-")) {
+                                s.delete(s.length() - 1, s.length());
+                                return;
+                            }
 
-                        String phoneNumWithDash = StringUtil.convertPhoneNumWithDash(str);
-                        s.replace(0, s.length() - 1, phoneNumWithDash, 0, phoneNumWithDash.length() - 1);
-                    } else {
-                        // 숫자 외의 문자가 들어간 경우
-                        if(str.contains("-")) {
-                            // 숫자와 "-" 만 들어간 경우
-                            String strWithoutDash = str.replaceAll("-", "");
-                            s.replace(0, s.length() - 1, strWithoutDash, 0, strWithoutDash.length() - 1);
+                            String phoneNumWithDash = StringUtil.convertPhoneNumWithDash(str);
+                            s.replace(0, s.length() - 1, phoneNumWithDash, 0, phoneNumWithDash.length() - 1);
+                        } else {
+                            // 숫자 외의 문자가 들어간 경우
+                            if (str.contains("-") && StringUtils.isNumeric(str.replaceAll("-", ""))) {
+                                // 숫자와 "-" 만 들어간 경우
+                                String strWithoutDash = str.replaceAll("-", "");
+                                s.replace(0, s.length() - 1, strWithoutDash, 0, strWithoutDash.length() - 1);
+                            }
                         }
                     }
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -395,6 +402,18 @@ public class ViewUtil {
 
             return false;
         }
+    }
+
+
+    /**
+     * view 이벤트 발생시 소프트 키보드 감추기
+     *
+     * @param context 현재 화면
+     * @param view 이벤트 발생 View (ex. Button)
+     */
+    public static void hideSoftKeyboard(Context context, View view) {
+        InputMethodManager mgr = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     public interface ListViewNotScrollClickListener {

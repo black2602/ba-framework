@@ -15,6 +15,7 @@ import android.util.DisplayMetrics;
 import com.angel.black.baframework.logger.BaLog;
 
 import java.nio.IntBuffer;
+import java.util.UUID;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -163,5 +164,36 @@ public class DeviceUtil {
         BaLog.d("audioManager.getRingerMode() : " + audioManager.getRingerMode());
 
         return audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE;
+    }
+
+    /**
+     * 디바이스 유심의 UUID 를 가져온다.
+     * 권한 필요 - 전화 권한
+     * @param mContext
+     * @return
+     */
+    public static String getDevicesTelephonyUUID(Context mContext){
+        final TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+        final String tmDevice, tmSerial, androidId;
+        tmDevice = "" + tm.getDeviceId();
+        tmSerial = "" + tm.getSimSerialNumber();
+        androidId = "" + android.provider.Settings.Secure.getString(mContext.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+        UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
+        String deviceId = deviceUuid.toString();
+
+        BaLog.i("deviceUuid=" + deviceId);
+
+        return deviceId;
+    }
+
+    /**
+     * 랜덤한 UUID 한개를 생성한다.
+     * @return
+     */
+    public synchronized static String getDeviceUUID() {
+        String deviceUuid = UUID.randomUUID().toString();
+        BaLog.i("deviceUuid=" + deviceUuid);
+
+        return deviceUuid;
     }
 }

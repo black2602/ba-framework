@@ -19,4 +19,97 @@
     <style name="WhiteTextButton.Borderless" parent="Base.Widget.AppCompat.Button.Borderless" >
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="MainButton" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:background">@drawable/selector_main_button</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:textColor">@drawable/selector_main_button_text</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+
+    </style>
+
+    <style name="CustomDialog" parent="Theme.AppCompat.Dialog">
+        <!--<item name="android:windowTitleStyle">@style/CustomDialog.Title</item>-->
+        <!--<item name="android:windowTitleBackgroundStyle">@style/CustomDialog.Title.Background</item>-->
+        <item name="android:windowBackground">@drawable/shape_main_color_stroke_white_round_box</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/MainButton</item>
+        <item name="android:bottomBright">@android:color/white</item>
+        <item name="android:bottomDark">@android:color/white</item>
+        <item name="android:bottomMedium">@android:color/white</item>
+        <item name="android:centerBright">@android:color/white</item>
+        <item name="android:centerDark">@android:color/white</item>
+        <item name="android:centerMedium">@android:color/white</item>
+        <item name="android:fullBright">@color/colorPrimary</item>
+        <item name="android:fullDark">@color/colorPrimary</item>
+        <item name="android:topDark">@color/colorPrimary</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+
+    </style>
+
+    <style name="CustomDialog.Title" parent="android:Widget.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="CustomDialog.Title.Background" parent="Base.DialogWindowTitleBackground.AppCompat">
+        <item name="android:background">@color/colorAccent</item>
+    </style>
+
+    <style name="CustomDialog.Text" parent="@android:style/TextAppearance.Holo.Medium">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="MainColorText">
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="MainColorText.Small" parent="MainColorText">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="MainColorText.LowMiddle" parent="MainColorText">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="MainColorText.Middle" parent="MainColorText">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="MainColorText.Large" parent="MainColorText">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="MainDarkColorText">
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="MainDarkColorText.Small" parent="MainDarkColorText">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="MainDarkColorText.Middle" parent="MainDarkColorText">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="MainDarkColorText.Large" parent="MainDarkColorText">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="MainLightColorText">
+        <item name="android:textColor">@color/colorPrimaryLight</item>
+    </style>
+
+    <style name="MainLightColorText.Middle" parent="MainLightColorText">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="MainLightColorText.Small" parent="MainLightColorText">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="MainEditText" parent="MainColorText.Middle">
+
+    </style>
 </resources>

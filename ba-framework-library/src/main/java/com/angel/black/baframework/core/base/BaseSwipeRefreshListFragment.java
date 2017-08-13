@@ -35,7 +35,7 @@ public abstract class BaseSwipeRefreshListFragment extends BaseListFragment impl
         BaLog.i("before mCurPage=" + mCurPage);
         mCurPage = 1;
         mCurItemCount = 0;
-        requestList();
+        requestList(true);
     }
 
     protected void setLoadComplete(boolean success) {

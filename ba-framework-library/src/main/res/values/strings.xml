@@ -38,4 +38,20 @@
     <string name="select_order">순서를 선택하세요.</string>
     <string name="msg_select_seq_all">순서를 모두 선택하여 주세요.</string>
 
+    <!-- 일반 메시지 -->
+    <string name="empty_data">데이터가 없습니다.</string>
+    <string name="hint_input_search_keyword">검색할 키워드를 입력하세요</string>
+
+    <!-- 주소 검색 관련 -->
+    <string name="guide_search_addr">주소를 검색하세요</string>
+    <string name="addr_search">주소 검색</string>
+    <string name="error_not_found_search_result">검색 결과가 없습니다.</string>
+    <string name="select_addr">주소 선택</string>
+    <string name="street_addr_label">도로명 : </string>
+    <string name="street_addr_format" formatted="false">도로명 : %s</string>
+    <string name="jibun_addr_label">지번 : </string>
+    <string name="jibun_addr_format" formatted="false">지번 : %s</string>
+    <string name="addr_input_validation_error">검색할 주소는 1자 이상 입력해주세요.</string>
+    <string name="next">다음</string>
+    <string name="permission_access">권한 접근</string>
 </resources>

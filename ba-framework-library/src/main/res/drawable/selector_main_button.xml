@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@drawable/shape_main_color_round_box"/>
+    <item android:drawable="@drawable/shape_main_color_stroke_white_round_box"/>
+
+</selector>
