@@ -4,4 +4,7 @@
     <dimen name="custom_dialog_width">300dp</dimen>
     <dimen name="custom_dialog_title_height">52dp</dimen>
 
+    <dimen name="security_keyboard_height">76dp</dimen>
+    <dimen name="security_keyboard_key_margin">4dp</dimen>
+
 </resources>

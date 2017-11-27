@@ -5,6 +5,7 @@ import com.angel.black.baframework.logger.BaLog;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -57,5 +58,14 @@ public class DebugUtil {
 
     private String getTimeString(long timeMillis) {
         return mSimpleDateFormat.format(new Date(timeMillis));
+    }
+
+    public static void debugList(List list) {
+        printLine();
+        for (int i = 0; i < list.size(); i++) {
+            Object obj = list.get(i);
+            BaLog.d("[" + i + "] = " + obj.toString());
+        }
+        printLine();
     }
 }

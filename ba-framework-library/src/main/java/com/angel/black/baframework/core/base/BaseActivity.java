@@ -348,6 +348,11 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         }
     }
 
+    public boolean isDialogShown() {
+        Fragment dialogFragment = getSupportFragmentManager().findFragmentByTag(CustomDialogFragment.TAG);
+        return dialogFragment != null && dialogFragment.isVisible();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

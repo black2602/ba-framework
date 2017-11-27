@@ -1,7 +1,9 @@
 package com.angel.black.baframework.util;
 
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.RecyclerView;
@@ -414,6 +416,20 @@ public class ViewUtil {
     public static void hideSoftKeyboard(Context context, View view) {
         InputMethodManager mgr = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public static boolean isActionBarVisible(Activity activity) {
+        return activity.getActionBar() != null && activity.getActionBar().isShowing();
+    }
+
+
+    public static int getActionBarHeight(Activity activity) {
+        final TypedArray styledAttributes = activity.getTheme().obtainStyledAttributes(
+                new int[] { android.R.attr.actionBarSize });
+        int actionBarSize = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
+
+        return actionBarSize;
     }
 
     public interface ListViewNotScrollClickListener {

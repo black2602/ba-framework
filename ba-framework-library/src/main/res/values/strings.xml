@@ -54,4 +54,5 @@
     <string name="addr_input_validation_error">검색할 주소는 1자 이상 입력해주세요.</string>
     <string name="next">다음</string>
     <string name="permission_access">권한 접근</string>
+    <string name="rearrange">재배열</string>
 </resources>
