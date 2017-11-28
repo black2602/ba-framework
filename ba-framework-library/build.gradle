@@ -3,11 +3,11 @@ apply plugin: 'com.jfrog.bintray'
 
 boolean isSampleApp = false
 
-if (getGradle().getStartParameter().getTaskRequests().toString().contains("Library")){
-    apply plugin: 'com.android.library'
-} else {
-    isSampleApp = true
+if (isSampleApp){
     apply plugin: 'com.android.application'
+
+} else {
+    apply plugin: 'com.android.library'
 }
 
 Properties localProps = new Properties()
@@ -35,19 +35,19 @@ android {
         }
     }
 
-    flavorDimensions "full"
-    productFlavors {
-        library {
-            dimension "full"
-        }
-
-        sample {
-            dimension "full"
-            if(isSampleApp)
-                applicationIdSuffix ".sample"
-        }
-
-    }
+//    flavorDimensions "full"
+//    productFlavors {
+//        library {
+//            dimension "full"
+//        }
+//
+//        sample {
+//            dimension "full"
+////            if(isSampleApp)
+////                applicationIdSuffix ".sample"
+//        }
+//
+//    }
 
     lintOptions {
         abortOnError false
