@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dialog_root"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -20,9 +21,29 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/custom_dialog_title_height"
             android:background="@color/colorPrimary"
-            android:gravity="center"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:paddingLeft="16dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:padding="8dp"
+                android:visibility="gone"
+                android:clickable="true"
+                tools:visibility="visible">
+
+                <ImageButton
+                    android:id="@+id/btn_close"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_close"
+                    android:background="@null"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"/>
+
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/title_img"
@@ -36,7 +57,8 @@
                 style="@style/CustomDialog.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"/>
+                android:layout_centerInParent="true"
+                tools:text="Title"/>
 
         </RelativeLayout>
 
@@ -45,7 +67,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.finger.fmt.core.ui.view.DialogScrollView
+            <com.finger.rele.core.ui.view.DialogScrollView
                 android:id="@+id/dialog_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -61,7 +83,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-            </com.finger.fmt.core.ui.view.DialogScrollView>
+            </com.finger.rele.core.ui.view.DialogScrollView>
 
         </LinearLayout>
 
@@ -78,26 +100,28 @@
                 style="@style/MainButton"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:text="Button"/>
+                android:layout_marginRight="16dp"
+                android:text="Button"
+                android:visibility="visible"/>
 
             <Button
                 android:id="@+id/dialog_button2"
                 style="@style/MainButton"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_marginLeft="16dp"
-                android:text="Button"/>
+                android:layout_marginRight="16dp"
+                android:text="Button"
+                android:visibility="visible"/>
 
             <Button
                 android:id="@+id/dialog_button3"
                 style="@style/MainButton"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_marginLeft="16dp"
                 android:text="Button"/>
 
         </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

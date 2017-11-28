@@ -49,7 +49,7 @@
 			android:id="@+id/fragment_addr_search"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:name="com.angel.black.baframework.module.AddressSearcher$AddressSearchFragment"
+			android:name="com.blackangel.baframework.module.AddressSearcher$AddressSearchFragment"
 			android:tag="fragAddrSearch"/>
 
 	</FrameLayout>

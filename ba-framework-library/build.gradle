@@ -1,18 +1,32 @@
-apply plugin: 'com.android.library'
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+boolean isSampleApp = false
+
+if (getGradle().getStartParameter().getTaskRequests().toString().contains("Library")){
+    apply plugin: 'com.android.library'
+} else {
+    isSampleApp = true
+    apply plugin: 'com.android.application'
+}
+
+Properties localProps = new Properties()
+localProps.load(new FileInputStream(file('../local.properties')))
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
 
     useLibrary  'org.apache.http.legacy'
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0.0"
+
+        if(isSampleApp)
+            applicationId 'com.blackangel.baframework'
     }
     buildTypes {
         release {
@@ -20,20 +34,42 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "full"
+    productFlavors {
+        library {
+            dimension "full"
+        }
+
+        sample {
+            dimension "full"
+            if(isSampleApp)
+                applicationIdSuffix ".sample"
+        }
+
+    }
+
     lintOptions {
         abortOnError false
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:design:25.3.1'
-    compile 'org.apache.commons:commons-lang3:3.4'
-    compile 'com.theartofdev.edmodo:android-image-cropper:2.2.3'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+    implementation "com.android.support:design:${localProps['support.version']}"
+    implementation "com.android.support:preference-v7:${localProps['support.version']}"
+    implementation 'org.apache.commons:commons-lang3:3.4'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.2.3'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation 'com.facebook.android:facebook-android-sdk:4.+'
+
 }
 
-group = 'com.angel.black'
+group = 'com.blackangel'
 version = '1.0.0'
 
 install {
@@ -45,9 +81,9 @@ install {
             inceptionYear '2017'
 
             packaging 'aar'
-            groupId 'com.angel.black'
+            groupId 'com.blackangel'
             artifactId 'ba-framework-library'
-            version '1.0.0'
+            version '1.0.1'
 
             licenses {
                 license {
@@ -75,6 +111,7 @@ bintray {
     key = '4dc510ba73597de06bb4afb8769c23fc8cbedb44'
     configurations = ['archives']
 
+    publish = true
     override = true         // 이미 배포된 버전에서 버전명은 그대로 두고, 소스 수정하여 다시 배포할 때 필요
 
     pkg {
@@ -83,8 +120,7 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/black2602/ba-framework'
         version {
-            name = '1.0.0'
+            name = '1.0.1'
         }
     }
-
 }

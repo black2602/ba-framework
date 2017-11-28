@@ -5,4 +5,14 @@
         <attr name="inputCellWidth" format="dimension" />
         <attr name="inputCellHeight" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="LabelInputView">
+        <attr name="label" format="reference|string" />
+        <attr name="hint" format="reference|string" />
+        <attr name="inputType" format="reference|integer" />
+        <attr name="innerEditClickable" format="boolean" />
+        <attr name="textSize" format="dimension" />
+        <attr name="labelTextSize" format="dimension" />
+        <attr name="multiline" format="boolean" />
+    </declare-styleable>
 </resources>

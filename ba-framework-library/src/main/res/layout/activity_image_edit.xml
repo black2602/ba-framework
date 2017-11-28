@@ -101,7 +101,7 @@
 
     <fragment
         android:id="@+id/fragment_previews"
-        android:name="com.angel.black.baframework.media.image.fragment.PreviewsFragment"
+        android:name="com.blackangel.baframework.media.image.fragment.PreviewsFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/bottombar"
@@ -112,7 +112,7 @@
         android:layout_height="match_parent"
         android:layout_above="@id/fragment_previews" >
 
-        <com.angel.black.baframework.ui.view.viewpager.InfiniteViewPager
+        <com.blackangel.baframework.ui.view.viewpager.InfiniteViewPager
             android:id="@+id/viewpager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

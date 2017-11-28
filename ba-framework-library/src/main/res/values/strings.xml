@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">BAFramework</string>
+    <string name="app_scheme">baframework</string>
 
     <!-- 단문 명령 단어 모음 -->
     <string name="complete">완료</string>
@@ -55,4 +56,5 @@
     <string name="next">다음</string>
     <string name="permission_access">권한 접근</string>
     <string name="rearrange">재배열</string>
+
 </resources>

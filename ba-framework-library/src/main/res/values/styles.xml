@@ -13,6 +13,15 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="AppTheme.FullscreenTheme" parent="AppTheme">
+        <item name="android:windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.SplashTheme" parent="AppTheme.FullscreenTheme">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
     <style name="EmptyListText"
         />
 
@@ -28,6 +37,7 @@
         <item name="android:paddingRight">16dp</item>
 
     </style>
+
 
     <style name="CustomDialog" parent="Theme.AppCompat.Dialog">
         <!--<item name="android:windowTitleStyle">@style/CustomDialog.Title</item>-->
@@ -46,6 +56,38 @@
         <item name="android:windowFrame">@null</item>
         <item name="android:textColorPrimary">@android:color/black</item>
 
+    </style>
+
+    <style name="CustomDialog.Bottom" parent="CustomDialog" >
+        <item name="android:windowBackground">@drawable/shape_main_color_stroke_white_round_box</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/MainButton</item>
+        <item name="android:bottomBright">@android:color/white</item>
+        <item name="android:bottomDark">@android:color/white</item>
+        <item name="android:bottomMedium">@android:color/white</item>
+        <item name="android:centerBright">@android:color/white</item>
+        <item name="android:centerDark">@android:color/white</item>
+        <item name="android:centerMedium">@android:color/white</item>
+        <item name="android:fullBright">@color/colorPrimary</item>
+        <item name="android:fullDark">@color/colorPrimary</item>
+        <item name="android:topDark">@color/colorPrimary</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+
+    <style name="CustomDialog.FullScreen" parent="android:Theme.Black.NoTitleBar.Fullscreen" >
+        <item name="android:windowBackground">@drawable/shape_main_color_stroke_white_round_box</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/MainButton</item>
+        <item name="android:bottomBright">@android:color/white</item>
+        <item name="android:bottomDark">@android:color/white</item>
+        <item name="android:bottomMedium">@android:color/white</item>
+        <item name="android:centerBright">@android:color/white</item>
+        <item name="android:centerDark">@android:color/white</item>
+        <item name="android:centerMedium">@android:color/white</item>
+        <item name="android:fullBright">@color/colorPrimary</item>
+        <item name="android:fullDark">@color/colorPrimary</item>
+        <item name="android:topDark">@color/colorPrimary</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
     </style>
 
     <style name="CustomDialog.Title" parent="android:Widget.TextView">
@@ -112,4 +154,23 @@
     <style name="MainEditText" parent="MainColorText.Middle">
 
     </style>
+
+    <style name="EmptyText" parent="MainColorText.Middle">
+        <item name="android:textColor">@color/gray_text_color</item>
+    </style>
+
+    <style name="TextInputLabelText" parent="MainColorText">
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="UnderlineIfEnabled">
+        <item name="android:background">@drawable/selector_underline_if_enabled</item>
+    </style>
+
+    <style name="UnderlineIfEnabled.EditText" parent="UnderlineIfEnabled">
+        <item name="android:textColor">@drawable/selector_main_edittext_color</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+    </style>
+
 </resources>
