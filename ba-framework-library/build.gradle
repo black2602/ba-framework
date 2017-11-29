@@ -35,20 +35,6 @@ android {
         }
     }
 
-//    flavorDimensions "full"
-//    productFlavors {
-//        library {
-//            dimension "full"
-//        }
-//
-//        sample {
-//            dimension "full"
-////            if(isSampleApp)
-////                applicationIdSuffix ".sample"
-//        }
-//
-//    }
-
     lintOptions {
         abortOnError false
     }
@@ -69,6 +55,7 @@ dependencies {
 
 }
 
+// bintray 에서 인식하는 그룹명/버전 명시(필수)
 group = 'com.blackangel'
 version = '1.0.0'
 
@@ -83,7 +70,7 @@ install {
             packaging 'aar'
             groupId 'com.blackangel'
             artifactId 'ba-framework-library'
-            version '1.0.1'
+            version '1.0.0'
 
             licenses {
                 license {
@@ -107,11 +94,11 @@ install {
 }
 
 bintray {
-    user = 'black2602'
-    key = '4dc510ba73597de06bb4afb8769c23fc8cbedb44'
+    user = BINTRAY_USER_NAME
+    key = BINTRAY_USER_KEY
     configurations = ['archives']
 
-    publish = true
+    publish = true        // aar 파일을 bintray에서 자동으로 배포하게 하려면 publish를 true로 설정해야 합니다. (기본값은 false)
     override = true         // 이미 배포된 버전에서 버전명은 그대로 두고, 소스 수정하여 다시 배포할 때 필요
 
     pkg {
@@ -120,7 +107,7 @@ bintray {
         licenses = ['Apache-2.0']
         vcsUrl = 'https://github.com/black2602/ba-framework'
         version {
-            name = '1.0.1'
+            name = '1.0.0'
         }
     }
 }

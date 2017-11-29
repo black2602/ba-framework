@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -131,5 +132,20 @@ public class ResourceUtil {
         }
 
         return "";
+    }
+
+    /**
+     * 특정 색깔의 특정 비율의 어두운 색깔 반환 - 작을수록 어두워짐
+     * @param color
+     * @param factor
+     * @return
+     */
+    public static int darker(int color, double factor) {
+        int a = Color.alpha(color);
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+
+        return Color.argb(a, Math.max((int) (r * factor), 0), Math.max((int) (g * factor), 0), Math.max((int) (b * factor), 0));
     }
 }

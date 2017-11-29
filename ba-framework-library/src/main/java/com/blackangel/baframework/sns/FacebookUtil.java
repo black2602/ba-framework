@@ -32,7 +32,11 @@ import java.util.Arrays;
 public class FacebookUtil {
 
     public static boolean isLogined() {
-        return AccessToken.getCurrentAccessToken() != null && Profile.getCurrentProfile() != null;
+        boolean logined = false;
+
+        logined = AccessToken.getCurrentAccessToken() != null && Profile.getCurrentProfile() != null;
+        MyLog.d("facebook logined=" + logined);
+        return logined;
     }
 
     public static void loginFacebookViaFacebookButton(final BaseActivity activity, CallbackManager fbCallbackManager,

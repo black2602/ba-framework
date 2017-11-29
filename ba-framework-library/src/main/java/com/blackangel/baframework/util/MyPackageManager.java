@@ -242,4 +242,17 @@ public class MyPackageManager {
 
         return tempDir.getAbsolutePath();
     }
+
+    /**
+     * 구글 플레이스토어 페이지를 연다.
+     *
+     * @param id 앱 패키지명
+     */
+    public static void goToGooglePlay(Context context, String id) {
+        try {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + id)));
+        } catch (ActivityNotFoundException e) {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + id)));
+        }
+    }
 }
