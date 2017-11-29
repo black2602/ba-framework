@@ -440,7 +440,7 @@ public class GalleryFragment extends BaseFragment implements AdapterView.OnItemC
             if(mGridAdapter.getCount() <= 0) {
                 mGalleryHandler.sendEmptyMessageDelayed(0, 1000);
             } else {
-//                mLoadingProgress.setVisibility(View.GONE);
+//                mLoadingProgressDialog.setVisibility(View.GONE);
                 hideProgress();
                 mGridAdapter.notifyDataSetChanged();
                 mInitialLoadedGallery = true;

@@ -2,6 +2,7 @@ package com.blackangel.baframework.core.base;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -21,25 +22,26 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.blackangel.baframework.R;
 import com.blackangel.baframework.logger.MyLog;
+import com.blackangel.baframework.network.ApiProgressListener;
 import com.blackangel.baframework.ui.dialog.AlertDialogFragment;
 import com.blackangel.baframework.ui.dialog.DialogClickListener;
 import com.blackangel.baframework.ui.dialog.PermissionConfirmationDialog;
 import com.blackangel.baframework.ui.dialog.custom.CustomDialogFragment;
 import com.blackangel.baframework.ui.dialog.custom.DialogItems;
+import com.blackangel.baframework.util.BuildUtil;
 
 /**
  * Created by KimJeongHun on 2016-05-19.
  */
-public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener {
+public abstract class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener, ApiProgressListener {
     protected final String TAG = this.getClass().getSimpleName();
 
     protected Toolbar mToolbar;
-    protected ProgressBar mLoadingProgress;
+    private ProgressDialog mLoadingProgressDialog;
     protected ViewGroup mRootLayout;        // 액티비티의 최상위 루트 레이아웃(액션바 포함)
     protected ViewGroup mContentsLayout;    // 타이틀바 아래에 들어갈 액티비티의 내용 레이아웃
 
@@ -108,36 +110,99 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         }
     }
 
-    public void addFragment(int resId, Fragment fragment, String tag, boolean addToBackStack) {
+    public void addFragment(int resId, Fragment fragment) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.add(resId, fragment, fragment.getClass().getSimpleName());
+        ft.commitAllowingStateLoss();
+    }
+
+    public void addFragment(int resId, Fragment fragment, String tag) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(resId, fragment, tag);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.commitAllowingStateLoss();
+    }
+
+    public void addFragmentWithAnim(int resId, Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_right_in, R.anim.slide_left_out, R.anim.slide_left_in, R.anim.slide_right_out);
+        ft.add(resId, fragment, fragment.getClass().getSimpleName());
         if(addToBackStack)
             ft.addToBackStack(null);
         ft.commitAllowingStateLoss();
     }
 
-    public void replaceFragment(int resId, Fragment fragment, String tag, boolean addToBackStack, boolean isAni) {
+    public void replaceFragment(int resId, Fragment fragment) {
+        replaceFragment(resId, fragment, fragment.getClass().getSimpleName(), false);
+    }
+
+    public void replaceFragment(int resId, Fragment fragment, boolean addToBackStack) {
+        replaceFragment(resId, fragment, fragment.getClass().getSimpleName(), addToBackStack);
+    }
+
+    public void replaceFragment(int resId, Fragment fragment, String tag, boolean addToBackStack) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        if(isAni)
-            ft.setCustomAnimations(R.anim.slide_right_in, R.anim.slide_left_out, R.anim.slide_left_in, R.anim.slide_right_out);
+        ft.replace(resId, fragment, tag);
         if(addToBackStack)
             ft.addToBackStack(null);
-        ft.replace(resId, fragment, tag);
         ft.commitAllowingStateLoss();
+    }
+
+    public void replaceFragmentWithAnim(int resId, Fragment fragment) {
+        this.replaceFragmentWithAnim(resId, fragment, false);
+    }
+
+    public void replaceFragmentWithTransition(int resId, Fragment fragment, View view, String transition) {
+        this.replaceFragmentWithTransition(resId, fragment, false, view, transition);
+    }
+
+    public void replaceFragmentWithUpAnim(int resId, Fragment fragment) {
+        replaceFragmentWithUpAnim(resId, fragment, false);
+    }
+
+    public void replaceFragmentWithUpAnim(int resId, Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_up_in, R.anim.slide_up_out, R.anim.slide_down_in, R.anim.slide_down_out);
+        ft.replace(resId, fragment, fragment.getClass().getSimpleName());
+        if(addToBackStack)
+            ft.addToBackStack(null);
+        ft.commitAllowingStateLoss();
+    }
+
+    public void replaceFragmentWithAnim(int resId, Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_right_in, R.anim.slide_left_out, R.anim.slide_left_in, R.anim.slide_right_out);
+        ft.replace(resId, fragment, fragment.getClass().getSimpleName());
+        if(addToBackStack)
+            ft.addToBackStack(null);
+        ft.commitAllowingStateLoss();
+        getSupportFragmentManager().executePendingTransactions();
+    }
+
+    public void replaceFragmentWithTransition(int resId, Fragment fragment, boolean addToBackStack, View view, String transition) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(resId, fragment, fragment.getClass().getSimpleName());
+        if(addToBackStack)
+            ft.addToBackStack(null);
+        ft.addSharedElement(view, transition);
+        ft.commitAllowingStateLoss();
+    }
+
+    public void replaceFragmentWithBackAnim(int resId, Fragment fragment) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_left_in, R.anim.slide_right_out, R.anim.slide_right_in, R.anim.slide_left_out);
+        ft.replace(resId, fragment, fragment.getClass().getSimpleName());
+        ft.commitAllowingStateLoss();
+    }
+
+    protected Fragment getCurrentFragment(String tag) {
+        return getSupportFragmentManager().findFragmentByTag(tag);
     }
 
     public void removeFragment(String tag) {
         FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-//		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-//        ft.setCustomAnimations(R.anim.slide_down_to_up, R.anim.slide_up_to_down);
-        ft.remove(fm.findFragmentByTag(tag));
-        ft.commitAllowingStateLoss();
-    }
+        Fragment fragment = fm.findFragmentByTag(tag);
 
-    public void removeFragment(Fragment fragment) {
-        FragmentManager fm = getSupportFragmentManager();
+        MyLog.d("found fragment = " + fragment);
 
         if(fragment != null) {
             FragmentTransaction ft = fm.beginTransaction();
@@ -147,16 +212,77 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         }
     }
 
-    public void showProgress() {
-        if(mLoadingProgress == null) {
-            mLoadingProgress = (ProgressBar) findViewById(R.id.loading_progress);
+    public void removeFragment(Fragment fragment) {
+        FragmentManager fm = getSupportFragmentManager();
+
+        if(fragment != null) {
+            MyLog.d("fragment = " + fragment.getClass().getSimpleName());
+
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+            ft.remove(fragment);
+            ft.commitAllowingStateLoss();
         }
-        mLoadingProgress.setVisibility(View.VISIBLE);
+    }
+
+    public void removeFragment(Fragment fragment, int enterAnim, int exitAnim) {
+        FragmentManager fm = getSupportFragmentManager();
+
+        if(fragment != null) {
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.setCustomAnimations(enterAnim, exitAnim);
+            ft.remove(fragment);
+            ft.commitAllowingStateLoss();
+        }
+    }
+
+    public Fragment findFragment(Class<? extends Fragment> fragmentClass) {
+        return getSupportFragmentManager().findFragmentByTag(fragmentClass.getSimpleName());
+    }
+
+    public ProgressDialog createProgressDialog() {
+        return new ProgressDialog(this, R.style.LoadingProgressStyle);
+    }
+
+    public void showProgress() {
+        if(!isFinishing()) {
+            if(mLoadingProgressDialog == null) {
+                mLoadingProgressDialog = createProgressDialog();
+                mLoadingProgressDialog.setCancelable(false);
+                mLoadingProgressDialog.setCanceledOnTouchOutside(false);
+            }
+
+            if(!isFinishing() && !mLoadingProgressDialog.isShowing()) {
+                mLoadingProgressDialog.setMessage("");
+                mLoadingProgressDialog.dismiss();
+                mLoadingProgressDialog.show();
+            }
+        }
+    }
+
+    public void showProgress(String message) {
+        if(!isFinishing()) {
+            if(mLoadingProgressDialog == null) {
+                mLoadingProgressDialog = createProgressDialog();
+                mLoadingProgressDialog.setCancelable(false);
+                mLoadingProgressDialog.setCanceledOnTouchOutside(false);
+            }
+
+            if(mLoadingProgressDialog.isShowing()) {
+                mLoadingProgressDialog.setMessage(message);
+            } else {
+                mLoadingProgressDialog.dismiss();
+                mLoadingProgressDialog.setMessage(message);
+                mLoadingProgressDialog.show();
+            }
+        }
     }
 
     public void hideProgress() {
-        if(mLoadingProgress != null && mLoadingProgress.isShown()) {
-            mLoadingProgress.setVisibility(View.GONE);
+        if(!isFinishing()) {
+            if(mLoadingProgressDialog != null && mLoadingProgressDialog.isShowing()) {
+                mLoadingProgressDialog.dismiss();
+            }
         }
     }
 
@@ -369,6 +495,28 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         MyLog.d("requestCode=" + requestCode + ", resultCode=" + resultCode, data);
+    }
+
+    @Override
+    public void onStartApi(String progressMsg) {
+        if(progressMsg == null || progressMsg.isEmpty())
+            showProgress();
+        else
+            showProgress(progressMsg);
+    }
+
+    @Override
+    public void onFinishApi() {
+        if(BuildUtil.isAboveJellyBean17() && this.isDestroyed()) {
+            return;
+        }
+
+        hideProgress();
+    }
+
+    @Override
+    public boolean isGlobalError(int errCode) {
+        return false;
     }
 
     public interface IntentExtraProvider {

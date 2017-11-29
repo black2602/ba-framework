@@ -1,4 +1,4 @@
-package com.blackangel.baframework.network;
+package com.blackangel.baframework.network.okhttp;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.data.DataFetcher;

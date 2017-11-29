@@ -5,6 +5,10 @@ import android.telephony.PhoneNumberUtils;
 
 import com.blackangel.baframework.logger.MyLog;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -111,6 +115,21 @@ public class StringUtil {
      */
     public static long getfilteredNumber(String text) {
         return IntegerUtil.getInt(text.replaceAll("\\D", ""), 0);
+    }
+
+    public static String getStringFromInputStream(InputStream is) {
+        BufferedReader r = new BufferedReader(new InputStreamReader(is));
+        StringBuilder total = new StringBuilder();
+        String line;
+        try {
+            while ((line = r.readLine()) != null) {
+                total.append(line).append('\n');
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return total.toString();
     }
 
     public static class RegularExpressions {
