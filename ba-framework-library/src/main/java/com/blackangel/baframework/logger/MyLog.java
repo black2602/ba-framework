@@ -25,72 +25,78 @@ import java.util.Set;
 public class MyLog {
     public static final String LOG_TAG = MyLog.class.getSimpleName();
 
-    public static final void e(String message) {
-        if (BaApplication.debug)
+
+    public static void e() {
+        if (!BaApplication.sDebug)
+            Log.e(LOG_TAG, buildLogMsg(""));
+    }
+
+    public static void e(String message) {
+        if (BaApplication.sDebug)
             Log.e(LOG_TAG, buildLogMsg(message));
     }
 
-    public static final void e(String tag, String message) {
-        if (BaApplication.debug)
+    public static void e(String tag, String message) {
+        if (BaApplication.sDebug)
             Log.e(tag, buildLogMsg(message));
     }
 
-    public static final void w(String message) {
-        if (BaApplication.debug)
+    public static void w(String message) {
+        if (BaApplication.sDebug)
             Log.w(LOG_TAG, buildLogMsg(message));
     }
 
-    public static final void w(String tag, String message) {
-        if (BaApplication.debug)
+    public static void w(String tag, String message) {
+        if (BaApplication.sDebug)
             Log.w(tag, buildLogMsg(message));
     }
 
     public static void i() {
-        if (BaApplication.debug)
+        if (BaApplication.sDebug)
             Log.i(LOG_TAG, buildLogMsg(""));
     }
 
-    public static final void i(String message) {
-        if (BaApplication.debug)
+    public static void i(String message) {
+        if (BaApplication.sDebug)
             Log.i(LOG_TAG, buildLogMsg(message));
     }
 
-    public static final void i(String tag, String message) {
-        if (BaApplication.debug)
+    public static void i(String tag, String message) {
+        if (BaApplication.sDebug)
             Log.i(tag, buildLogMsg(message));
     }
 
-    public static final void d() {
-        if (BaApplication.debug)
+    public static void d() {
+        if (BaApplication.sDebug)
             Log.d(LOG_TAG, buildLogMsg(""));
     }
 
-    public static final void d(Object... object) {
-        if (BaApplication.debug)
+    public static void d(Object... object) {
+        if (BaApplication.sDebug)
             Log.d(LOG_TAG, buildLogMsg(_MESSAGE(object)));
     }
 
-    public static final void d(String message) {
-        if (BaApplication.debug)
+    public static void d(String message) {
+        if (BaApplication.sDebug)
             Log.d(LOG_TAG, buildLogMsg(message));
     }
 
-    public static final void d(String tag, String message) {
-        if (BaApplication.debug)
+    public static void d(String tag, String message) {
+        if (BaApplication.sDebug)
             Log.d(tag, buildLogMsg(message));
     }
 
-    public static final void v(String message) {
-        if (BaApplication.debug)
+    public static void v(String message) {
+        if (BaApplication.sDebug)
             Log.v(LOG_TAG, buildLogMsg(message));
     }
 
-    public static final void v(String tag, String message) {
-        if (BaApplication.debug)
+    public static void v(String tag, String message) {
+        if (BaApplication.sDebug)
             Log.v(tag, buildLogMsg(message));
     }
 
-    public static String buildLogMsg(String message) {
+    private static String buildLogMsg(String message) {
         StackTraceElement ste = Thread.currentThread().getStackTrace()[4];
 
         StringBuilder sb = new StringBuilder();

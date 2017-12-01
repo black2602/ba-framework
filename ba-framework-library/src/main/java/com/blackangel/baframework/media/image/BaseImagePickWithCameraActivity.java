@@ -141,7 +141,7 @@ public class BaseImagePickWithCameraActivity extends BaseImagePickActivity imple
         mCurrentGalleryAlbumId = mGalleryFragment.getCurrentGalleryBucketId();
         mCameraFragment = CameraFragment.newInstance(mMaxImageCount - mCurRegisteredItemCount);
 
-        replaceFragment(R.id.container_gallery_camera, mCameraFragment, mCameraFragment.TAG, true, true);
+        replaceFragment(R.id.container_gallery_camera, mCameraFragment, true);
     }
 
     public void showGallery() {
@@ -151,7 +151,7 @@ public class BaseImagePickWithCameraActivity extends BaseImagePickActivity imple
             if(mGalleryFragment == null) {
                 mGalleryFragment = GalleryFragment.newInstance(mCurrentGalleryAlbumId, mMaxImageCount - mCurRegisteredItemCount);
 //                mGalleryFragment.setOneImageChange(mMaxImageCount == 1);
-                addFragment(R.id.container_gallery_camera, mGalleryFragment, mGalleryFragment.TAG, false);
+                addFragment(R.id.container_gallery_camera, mGalleryFragment, false);
             } else {
 
                 // 카메라 화면에서 갤러리로 돌아올 때 popBackStack() 시

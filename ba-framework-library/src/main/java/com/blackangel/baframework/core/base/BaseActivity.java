@@ -37,7 +37,7 @@ import com.blackangel.baframework.util.BuildUtil;
 /**
  * Created by KimJeongHun on 2016-05-19.
  */
-public abstract class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener, ApiProgressListener {
+public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener, ApiProgressListener {
     protected final String TAG = this.getClass().getSimpleName();
 
     protected Toolbar mToolbar;
@@ -111,14 +111,20 @@ public abstract class BaseActivity extends AppCompatActivity implements Toolbar.
     }
 
     public void addFragment(int resId, Fragment fragment) {
+        addFragment(resId, fragment, fragment.getClass().getSimpleName());
+    }
+
+    private void addFragment(int resId, Fragment fragment, String tag) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(resId, fragment, fragment.getClass().getSimpleName());
+        ft.add(resId, fragment, tag);
         ft.commitAllowingStateLoss();
     }
 
-    public void addFragment(int resId, Fragment fragment, String tag) {
+    public void addFragment(int resId, Fragment fragment, boolean addToBackStack) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.add(resId, fragment, tag);
+        ft.add(resId, fragment, fragment.getClass().getSimpleName());
+        if(addToBackStack)
+            ft.addToBackStack(null);
         ft.commitAllowingStateLoss();
     }
 
@@ -512,6 +518,11 @@ public abstract class BaseActivity extends AppCompatActivity implements Toolbar.
         }
 
         hideProgress();
+    }
+
+    @Override
+    public void onGlobalErrorResponse(int errCode, String errMessage, Object... extras) {
+
     }
 
     @Override

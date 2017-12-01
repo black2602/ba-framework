@@ -18,6 +18,11 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
+        <!-- 글라이드 초기화 모듈 -->
+        <meta-data
+            android:name=".network.imageloader.MyGlideModule"
+            android:value="GlideModule" />
+
         <activity android:name="com.facebook.FacebookActivity"
                   android:configChanges=
                       "keyboard|keyboardHidden|screenLayout|screenSize|orientation"

@@ -9,7 +9,6 @@ import com.blackangel.baframework.util.StringUtil;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
-import java.util.Map;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -106,7 +105,9 @@ public class BaseRetrofitRunner {
         });
     }
 
-    public interface HttpCustomHeaderAddable {
-        Map<String, String> getCustomHeaderMap();
+    public interface ApiModelResultListener<T> {
+        void onSuccess(T response);
+        void onFail(String url, int errCode, String message, Throwable throwable);
     }
+
 }

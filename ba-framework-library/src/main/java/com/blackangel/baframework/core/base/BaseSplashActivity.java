@@ -26,7 +26,6 @@ public abstract class BaseSplashActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSplashHandler.sendEmptyMessageDelayed(0, SPLASH_TIME);
 
         if(cacheSchemeDataIfExist()) {
             // Scheme URL 을 통해 앱 시작 명령을 받았을때
@@ -42,6 +41,7 @@ public abstract class BaseSplashActivity extends BaseActivity {
         }
 
         configPush();
+        mSplashHandler.sendEmptyMessageDelayed(0, SPLASH_TIME);
     }
 
     /**
@@ -84,11 +84,20 @@ public abstract class BaseSplashActivity extends BaseActivity {
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == 0) {
-                onSplashEnd();
+                if(isNeedShowIntro()) {
+                    goIntro();
+                } else {
+                    doAfterSplashSkipIntro();
+                }
             }
         }
     };
 
+    protected abstract void goIntro();
+
     protected abstract void configPush();
-    protected abstract void onSplashEnd();
+
+    protected abstract boolean isNeedShowIntro();
+
+    protected abstract void doAfterSplashSkipIntro();
 }

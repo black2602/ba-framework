@@ -762,7 +762,7 @@ public class BaseImageEditActivity extends BaseActivity implements
         } else if (viewId == R.id.btn_order) {
             showSubBottomBar(false);
             mImgOrderingFragment = ImageOrderingFragment.newInstance(mImagePathList);
-            addFragment(R.id.container_ordering_fragment, mImgOrderingFragment, ImageOrderingFragment.TAG, true);
+            addFragment(R.id.container_ordering_fragment, mImgOrderingFragment, true);
             mEditMode = EDIT_MODE_ORDERING;
 
             // 타이틀 - 순서변경
