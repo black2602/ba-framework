@@ -43,12 +43,13 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
-    implementation "com.android.support:design:${localProps['support.version']}"
-    implementation "com.android.support:preference-v7:${localProps['support.version']}"
+    implementation "com.android.support:design:26.1.0"
+    implementation "com.android.support:preference-v7:26.1.0"
     implementation 'org.apache.commons:commons-lang3:3.4'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.2.3'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.8.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.github.bumptech.glide:glide:3.7.0'
     implementation 'com.facebook.android:facebook-android-sdk:4.+'
@@ -94,8 +95,8 @@ install {
 }
 
 bintray {
-    user = BINTRAY_USER_NAME
-    key = BINTRAY_USER_KEY
+    user = localProps['BINTRAY.USER']
+    key = localProps['BINTRAY.KEY']
     configurations = ['archives']
 
     publish = true        // aar 파일을 bintray에서 자동으로 배포하게 하려면 publish를 true로 설정해야 합니다. (기본값은 false)

@@ -2,11 +2,11 @@ package com.blackangel.baframework.network.okhttp;
 
 import android.support.annotation.NonNull;
 
-import com.blackangel.baframework.BuildConfig;
 import com.blackangel.baframework.app.constants.ApiInfo;
 import com.blackangel.baframework.logger.MyLog;
 
 import java.io.IOException;
+import java.net.CookieHandler;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,6 +21,7 @@ import javax.net.ssl.X509TrustManager;
 
 import okhttp3.ConnectionSpec;
 import okhttp3.Interceptor;
+import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -55,6 +56,7 @@ public class OkHttpClientBuilder {
     private boolean isLogging;
     private Map<String, String> customHeaderMap;
     private HttpsInfo httpsInfo;
+    private CookieHandler cookieHandler;
 
     public OkHttpClientBuilder setTimeout(long timeout) {
         this.timeout = timeout;
@@ -73,6 +75,11 @@ public class OkHttpClientBuilder {
 
     public OkHttpClientBuilder setHttpsInfo(HttpsInfo httpsInfo) {
         this.httpsInfo = httpsInfo;
+        return this;
+    }
+
+    public OkHttpClientBuilder setCookieHandler(CookieHandler cookieHandler) {
+        this.cookieHandler = cookieHandler;
         return this;
     }
 
@@ -121,9 +128,12 @@ public class OkHttpClientBuilder {
                 }
             });
 
-            if(BuildConfig.DEBUG) {
+            if(isLogging) {
                 builder.addInterceptor(loggingInterceptor);
             }
+
+            if(cookieHandler != null)
+                builder.cookieJar(new JavaNetCookieJar(cookieHandler));
 
             client = builder.build();
 
@@ -145,9 +155,12 @@ public class OkHttpClientBuilder {
                 }
             });
 
-            if(BuildConfig.DEBUG) {
+            if(isLogging) {
                 builder.addInterceptor(loggingInterceptor);
             }
+
+            if(cookieHandler != null)
+                builder.cookieJar(new JavaNetCookieJar(cookieHandler));
 
             client = builder.build();
         }

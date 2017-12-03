@@ -58,6 +58,7 @@ public class BaseRetrofitRunner {
                     if (response.body() != null) {
                         T t = response.body();
                         MyLog.i("responseBody=" + t);
+
                         apiModelResultListener.onSuccess(t);
 
                     } else {
