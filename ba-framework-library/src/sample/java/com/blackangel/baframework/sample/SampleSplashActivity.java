@@ -15,7 +15,6 @@ public class SampleSplashActivity extends BaseSplashActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample_splash);
-        mToolbar.setVisibility(View.GONE);
     }
 
     @Override

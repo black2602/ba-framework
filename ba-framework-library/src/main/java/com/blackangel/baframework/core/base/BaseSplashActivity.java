@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
 
 import com.blackangel.baframework.R;
 import com.blackangel.baframework.core.AppSchemeData;
@@ -26,6 +27,7 @@ public abstract class BaseSplashActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mToolbar.setVisibility(View.GONE);
 
         if(cacheSchemeDataIfExist()) {
             // Scheme URL 을 통해 앱 시작 명령을 받았을때
