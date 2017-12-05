@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.RecyclerView;
@@ -572,6 +573,31 @@ public class ViewUtil {
             });
         }
     }
+
+    public static class TextInputErrorWatcher implements TextWatcher {
+        private TextInputLayout mTextInputLayout;
+
+        public TextInputErrorWatcher(TextInputLayout textInputLayout) {
+            this.mTextInputLayout = textInputLayout;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if(s.length() > 0) {
+                mTextInputLayout.setError(null);
+            }
+        }
+    };
 
     public interface ListViewNotScrollClickListener {
         void onListViewClickNotScroll();

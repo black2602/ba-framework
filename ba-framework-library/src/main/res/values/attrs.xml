@@ -15,4 +15,8 @@
         <attr name="labelTextSize" format="dimension" />
         <attr name="multiline" format="boolean" />
     </declare-styleable>
+
+    <declare-styleable name="SearchEditText">
+        <attr name="searchHint" format="reference|string" />
+    </declare-styleable>
 </resources>

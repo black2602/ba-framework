@@ -16,7 +16,7 @@ import android.widget.RelativeLayout;
 import com.blackangel.baframework.R;
 import com.blackangel.baframework.core.base.BaseActivity;
 import com.blackangel.baframework.logger.MyLog;
-import com.blackangel.baframework.ui.view.OneLetterPasswordEditText;
+import com.blackangel.baframework.ui.input.OneLetterPasswordEditText;
 import com.blackangel.baframework.util.ScreenUtil;
 import com.blackangel.baframework.util.ViewUtil;
 

@@ -12,13 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.blackangel.baframework.R;
 import com.blackangel.baframework.logger.MyLog;
-import com.blackangel.baframework.ui.view.recyclerview.AbsRecyclerViewHolder;
-import com.blackangel.baframework.ui.view.recyclerview.RecyclerViewAdapterHelper;
+import com.blackangel.baframework.ui.view.recyclerview.MyRecyclerViewAdapter;
 
 import java.util.List;
 
@@ -26,7 +24,6 @@ import java.util.List;
  * Created by KimJeongHun on 2016-09-11.
  */
 public abstract class BaseListFragment extends BaseFragment {
-    public static final String TAG_LIST_ROW = "listRow";
     public static final int DEFAULT_PAGE_SIZE = 20;
 
     protected RecyclerView mRecyclerView;
@@ -37,15 +34,15 @@ public abstract class BaseListFragment extends BaseFragment {
     protected ListRowClicker mListRowClicker;
 
     protected int mCurPage = 1;
-    protected int mCurItemCount = 0;    // 리스트의 현재까지 페이징 된 아이템 갯수
-    protected int mTotalItemCount = 0;  // 리스트의 모든 페이지 토탈 아이템 갯수
+    protected int mCurItemCount = 0;    // 현재까지 표시된 아이템 갯수
+    protected int mTotalItemCount = 0;  // 표시해야하는 총 토탈 아이템 갯수
 
-    private boolean isCanLoadMore = true;
-    protected boolean isInitialLoadCompleted = false;
-    protected boolean isAnimating = false;          // 프래그먼트가 애니메이션 중인지 여부
+    private boolean isCanLoadMore = true;               // 계속 로드(페이징) 가능한지 여부
+    protected boolean isInitialLoadCompleted = false;   // 최초 한번 데이터 로드가 완료되었는지 여부
+    protected boolean isAnimating = false;              // 프래그먼트가 애니메이션 중인지 여부
 
     public abstract void requestList(boolean showOutProgress);
-    protected abstract MyRecyclerViewAdapter createListAdapter();
+    protected abstract MyRecyclerViewAdapter createRecyclerViewAdapter();
 
     /**
      * RecyclerView 에 추가로 데코레이션 한다.
@@ -72,7 +69,7 @@ public abstract class BaseListFragment extends BaseFragment {
         mLayoutManager.setSmoothScrollbarEnabled(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mRecyclerViewAdapter = createListAdapter();
+        mRecyclerViewAdapter = createRecyclerViewAdapter();
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
         mRecyclerView.addOnScrollListener(new MyScrollListener());
 
@@ -211,7 +208,6 @@ public abstract class BaseListFragment extends BaseFragment {
 
     protected View inflateRowView(int layoutResId, ViewGroup parent) {
         View v = getActivity().getLayoutInflater().inflate(layoutResId, parent, false);
-        v.setTag(TAG_LIST_ROW);
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -230,6 +226,7 @@ public abstract class BaseListFragment extends BaseFragment {
 
     /**
      * 뷰페이저에 의해 프래그먼트가 추가될 때 데이터를 미리 로드하지 않고, 실제 사용자에게 보여질 때 로드한다.
+     * (뷰페이저를 사용하지 않는 경우 호출되지 않음)
      *
      * @param isVisibleToUser
      */
@@ -282,219 +279,6 @@ public abstract class BaseListFragment extends BaseFragment {
         MyLog.i("itemCount = " + count);
         return count <= 0;
     }
-
-    /**
-     * 상단에 헤더뷰를 포함하여 표현하는 커스텀 RecyclerView 어댑터
-     */
-    public abstract class MyRecyclerViewAdapterWithHeader extends MyRecyclerViewAdapter {
-        protected boolean mIsShownHeader = false;
-
-        public MyRecyclerViewAdapterWithHeader(RecyclerViewAdapterHelper recyclerViewAdapterHelper) {
-            super(recyclerViewAdapterHelper);
-            mIsShownHeader = getIsWillDisplayHeader();
-        }
-
-        @Override
-        public AbsRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            if(viewType == VIEW_TYPE_HEADER) {
-                View view = createHeaderView(parent);
-                return new HeaderViewHolder(view);
-            } else {
-                return super.onCreateViewHolder(parent, viewType);
-            }
-        }
-
-        @Override
-        public void onBindViewHolder(AbsRecyclerViewHolder holder, int position) {
-            if(holder instanceof HeaderViewHolder) {
-                bindHeaderView((HeaderViewHolder) holder);
-            } else if(holder instanceof ProgressViewHolder) {
-                super.onBindViewHolder(holder, position);
-            } else {
-                if(mIsShownHeader) {
-                    mRecyclerViewAdapterHelper.onBindViewHolder(holder, position, mDataset.getData(position - 1));
-                } else {
-                    mRecyclerViewAdapterHelper.onBindViewHolder(holder, position, mDataset.getData(position));
-                }
-            }
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            if(mIsShownHeader) {
-                if(position == 0) {
-                    return VIEW_TYPE_HEADER;
-                } else {
-                    return mDataset.getData(position - 1) != null ? VIEW_TYPE_ITEM : VIEW_TYPE_LOADING;
-                }
-            } else {
-                return mDataset.getData(position) != null ? VIEW_TYPE_ITEM : VIEW_TYPE_LOADING;
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return mIsShownHeader ? mDataset.length() + 1 : mDataset.length();
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return mIsShownHeader ? mDataset.getItemId(position - 1) : mDataset.getItemId(position);
-        }
-
-        @Override
-        public Object getData(int position) {
-            if(mIsShownHeader) {
-                return super.getData(position - 1);
-            } else {
-                return super.getData(position);
-            }
-        }
-
-        public void addData(Object data) {
-            super.addData(data);
-        }
-
-        public void remove(int position) {
-            if(mIsShownHeader) {
-                mDataset.removeData(position - 1);
-                notifyItemRemoved(position - 1);
-            } else {
-                super.remove(position);
-            }
-
-        }
-
-        public abstract void bindHeaderView(HeaderViewHolder holder);
-
-        public abstract View createHeaderView(ViewGroup parent);
-
-        public abstract boolean getIsWillDisplayHeader();
-
-        public boolean isShownHeader() {
-            return mIsShownHeader;
-        }
-
-        public void setShownHeader(boolean shownHeader) {
-            mIsShownHeader = shownHeader;
-        }
-
-        public void hideHeader() {
-            setShownHeader(false);
-            notifyDataSetChanged();
-        }
-    }
-
-    /**
-     * 헤더 뷰 없는 기본적인 커스텀 RecyclerView 어댑터
-     */
-    public class MyRecyclerViewAdapter extends RecyclerView.Adapter<AbsRecyclerViewHolder> {
-        final int VIEW_TYPE_HEADER = 0;
-        final int VIEW_TYPE_ITEM = 1;
-        final int VIEW_TYPE_LOADING = 2;
-
-        RecyclerViewAdapterHelper.RecyclerViewColletionData mDataset;
-        RecyclerViewAdapterHelper mRecyclerViewAdapterHelper;
-
-        public MyRecyclerViewAdapter(RecyclerViewAdapterHelper recyclerViewAdapterHelper) {
-            this.mRecyclerViewAdapterHelper = recyclerViewAdapterHelper;
-            this.mDataset = mRecyclerViewAdapterHelper.provideRecyclerViewColletionData();
-        }
-
-        public RecyclerViewAdapterHelper.RecyclerViewColletionData getDataset() {
-            MyLog.i("mDataset=" + mDataset);
-            return mDataset;
-        }
-
-        void setDataset(Object dataset) {
-            MyLog.i();
-            mDataset.setDataset(dataset);
-            notifyDataSetChanged();
-        }
-
-        public Object getData(int position) {
-            return mDataset.getData(position);
-        }
-
-        class ProgressViewHolder extends AbsRecyclerViewHolder {
-            ProgressBar progressBar;
-
-            ProgressViewHolder(View v) {
-                super(v);
-                progressBar = (ProgressBar) v.findViewById(R.id.loading_progress);
-            }
-        }
-
-        public class HeaderViewHolder extends AbsRecyclerViewHolder {
-            HeaderViewHolder(View v) {
-                super(v);
-            }
-        }
-
-        void addDataset(Object dataset) {
-            MyLog.i();
-            int itemCount = mDataset.addDataset(dataset);
-            notifyItemRangeInserted(mCurItemCount + 1, itemCount);
-        }
-
-        public void addData(Object data) {
-            mDataset.addData(data);
-            notifyItemInserted(getItemCount());
-        }
-
-        public void remove(int position) {
-            try {
-                mDataset.removeData(position);
-                notifyItemRemoved(position);
-            } catch (IndexOutOfBoundsException e) {
-                e.printStackTrace();
-
-                // 여기서 에러나는것은 무시
-            }
-        }
-
-        @Override
-        public int getItemViewType(int position) {
-            return mDataset.getData(position) != null ? VIEW_TYPE_ITEM : VIEW_TYPE_LOADING;
-        }
-
-        @Override
-        public AbsRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            AbsRecyclerViewHolder vh = null;
-            if(viewType == VIEW_TYPE_ITEM) {
-                vh = mRecyclerViewAdapterHelper.createViewHolder(parent);
-            } else {
-                // 로딩 뷰
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.loading_progress, parent, false);
-                vh = new ProgressViewHolder(view);
-            }
-
-            return vh;
-        }
-
-        @Override
-        public void onBindViewHolder(AbsRecyclerViewHolder holder, int position) {
-            if(holder instanceof ProgressViewHolder) {
-                ProgressViewHolder loadingViewHolder = (ProgressViewHolder) holder;
-                loadingViewHolder.progressBar.setIndeterminate(true);
-            } else {
-                mRecyclerViewAdapterHelper.onBindViewHolder(holder, position, mDataset.getData(position));
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return mDataset.length();
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return mDataset.getItemId(position);
-        }
-
-    }
-
-
 
     private class MyScrollListener extends RecyclerView.OnScrollListener {
         private int pastVisiblesItems, visibleItemCount, totalItemCount;

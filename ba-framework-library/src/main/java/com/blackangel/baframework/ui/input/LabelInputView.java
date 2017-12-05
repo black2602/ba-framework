@@ -1,4 +1,4 @@
-package com.blackangel.baframework.ui.view;
+package com.blackangel.baframework.ui.input;
 
 import android.app.Activity;
 import android.content.Context;

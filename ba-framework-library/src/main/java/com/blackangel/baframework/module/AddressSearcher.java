@@ -21,7 +21,8 @@ import com.blackangel.baframework.ui.dialog.custom.AbstractDialogCustomViewInfla
 import com.blackangel.baframework.ui.dialog.custom.DialogCustomViewInflater;
 import com.blackangel.baframework.ui.dialog.custom.DialogItems;
 import com.blackangel.baframework.ui.view.recyclerview.AbsRecyclerViewHolder;
-import com.blackangel.baframework.ui.view.recyclerview.RecyclerViewAdapterHelper;
+import com.blackangel.baframework.ui.view.recyclerview.MyRecyclerViewAdapter;
+import com.blackangel.baframework.ui.view.recyclerview.MyRecyclerViewAdapterHelper;
 import com.blackangel.baframework.ui.view.recyclerview.SimpleLineDividerItemDecoration;
 import com.blackangel.baframework.util.ScreenUtil;
 import com.blackangel.baframework.util.ViewUtil;
@@ -132,7 +133,7 @@ public class AddressSearcher {
         });
     }
 
-    public static class AddressSearchFragment extends BaseListFragment implements RecyclerViewAdapterHelper<List<Address>, Address>, BaseListFragment.ListRowClicker {
+    public static class AddressSearchFragment extends BaseListFragment implements MyRecyclerViewAdapterHelper<Address>, BaseListFragment.ListRowClicker {
 
         private OnAddressSelectedListener mOnAddressSelectedListener;
         private String mSearchKeyword;
@@ -207,8 +208,8 @@ public class AddressSearcher {
         }
 
         @Override
-        protected MyRecyclerViewAdapter createListAdapter() {
-            return new MyRecyclerViewAdapter(this);
+        protected MyRecyclerViewAdapter createRecyclerViewAdapter() {
+            return new MyRecyclerViewAdapter<Address>(this);
         }
 
         @Override
@@ -304,7 +305,7 @@ public class AddressSearcher {
         }
 
         @Override
-        public AbsRecyclerViewHolder createViewHolder(ViewGroup parent) {
+        public AbsRecyclerViewHolder createViewHolder(ViewGroup parent, int viewType) {
             View v = getActivity().getLayoutInflater().inflate(R.layout.adapter_address_list, parent, false);
 
             ViewGroup row = (ViewGroup) v.findViewById(R.id.row);
@@ -320,11 +321,6 @@ public class AddressSearcher {
             ((ViewHolder) holder).mPostNumber.setText(data.getPostalCode());
             ((ViewHolder) holder).mTxtStreetAddr.setText(data.getStreetAddress());
             ((ViewHolder) holder).mTxtJibunAddr.setText(data.getLegacyAddress());
-        }
-
-        @Override
-        public RecyclerViewColletionData<List<Address>, Address> provideRecyclerViewColletionData() {
-            return new ListModelRecyclerViewCollectionData<Address>();
         }
 
 //        @Override

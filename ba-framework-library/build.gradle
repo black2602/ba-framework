@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.bintray'
 
 boolean isSampleApp = false
 
-if (isSampleApp){
+if (isSampleApp) {
     apply plugin: 'com.android.application'
 
 } else {
@@ -32,6 +32,19 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // 샘플앱으로 실행시킬때 필요함 (bintrayUpload 는 productFlavor 설정시 동작안함)
+    flavorDimensions "full"
+    productFlavors {
+        library {
+            flavorDimensions ""
+        }
+
+        sample {
+            if(isSampleApp)
+                applicationIdSuffix ".sample"
         }
     }
 
