@@ -41,6 +41,12 @@ public abstract class BaseListFragment extends BaseFragment {
     protected boolean isInitialLoadCompleted = false;   // 최초 한번 데이터 로드가 완료되었는지 여부
     protected boolean isAnimating = false;              // 프래그먼트가 애니메이션 중인지 여부
 
+    /**
+     * 데이터를 요청한다.
+     * (뷰페이저의 PagerFragmentAdapter 안의 Fragment 로 포함되어 있을때는 setUserVisibleHint 에 의해 자동으로 호출된다.)
+     *
+     * @param showOutProgress
+     */
     public abstract void requestList(boolean showOutProgress);
     protected abstract MyRecyclerViewAdapter createRecyclerViewAdapter();
 
@@ -119,6 +125,7 @@ public abstract class BaseListFragment extends BaseFragment {
     }
 
     protected View createEmptyView() {
+        //todo 데이터가 없습니다. 로컬라이제이션
         View view = View.inflate(getContext(), R.layout.default_empty_view, null);
         TextView emptyTxt = (TextView) view.findViewById(R.id.txt_no_data);
         emptyTxt.setText(getEmptyText());
@@ -244,7 +251,17 @@ public abstract class BaseListFragment extends BaseFragment {
             } else {
                 mBaseListFragmentHandler.sendEmptyMessageDelayed(0, 500);
             }
+        } else {
+            onHiddenAtFragmentPagerAdatper();
         }
+    }
+
+    /**
+     * FragmentPagerAdapter 의 원소로 붙어있는 경우 사용자가 다른페이지로 이동하여 안보일때 콜백
+     */
+    protected void onHiddenAtFragmentPagerAdatper() {
+        MyLog.i();
+        initPagination();   // 안보일때 페이지 정보 초기화하여 다음번에 보여질때 1페이지부터 다시 데이터 쌓이도록..
     }
 
     private Handler mBaseListFragmentHandler = new Handler() {

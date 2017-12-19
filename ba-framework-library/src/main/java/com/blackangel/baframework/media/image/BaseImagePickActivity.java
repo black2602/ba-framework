@@ -113,7 +113,7 @@ public class BaseImagePickActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean onMenuItemClick(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.menu_complete) {
             onClickComplete();
             return true;

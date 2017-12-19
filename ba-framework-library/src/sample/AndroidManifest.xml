@@ -11,7 +11,7 @@
         android:icon="@drawable/ic_launcher_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/MyAppTheme"
         android:largeHeap="true">
 
         <meta-data
@@ -41,7 +41,7 @@
         <activity
             android:name=".sample.SampleSplashActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.SplashTheme">
+            android:theme="@style/MyAppTheme.SplashTheme">
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN" />

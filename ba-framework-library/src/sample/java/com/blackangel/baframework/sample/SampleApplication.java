@@ -9,6 +9,12 @@ import com.blackangel.baframework.BaApplication;
 public class SampleApplication extends BaApplication {
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        sDebug = true;
+    }
+
+    @Override
     protected String getAppServerUrl() {
         return null;
     }

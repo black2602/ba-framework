@@ -76,4 +76,8 @@ public class BuildUtil {
     public static boolean isAboveKitkat() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     }
+
+    public static boolean isAboveNougat() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
+    }
 }

@@ -4,6 +4,7 @@ package com.blackangel.baframework.ui.dialog.custom;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -96,6 +97,15 @@ public class CustomDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         MyLog.i(this.getClass().getSimpleName());
 
+        if(getDialog() == null) {
+            // getDialog() 가 null 이어서 죽는 케이스가 있음 -> onGetLayoutInflater 를 한번더 호출하여
+            // 내부에서 onCreateDialog 를 다시 호출하게 만들어서 getDialog() 가 null 이 되지 않도록 함
+            setShowsDialog(true);
+            onGetLayoutInflater(savedInstanceState);
+
+            return getDialog().findViewById(R.id.dialog_root);
+        }
+
         // childFragment 가 추가될 수 있게 하기 위해서 getDialog 로 가져온 다이얼로그 안의 루트 컨텐트뷰를 리턴해주어야함
         return getDialog().findViewById(R.id.dialog_root);
     }
@@ -135,102 +145,113 @@ public class CustomDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         MyLog.i(this.getClass().getSimpleName());
 
+
         // 중요함. 이것을 false 로 해주어야 이 CustomDialogFragment 가 onCreateDialog 를 통해
         // Dialog 내용 표시후에 일반적인 Fragment 로 라이프사이클이 동작함.
         // 따라서 안의 childFragment 를 추가해줄 수 있음
         setShowsDialog(false);
+        return buildDialog();
+    }
+
+    private Dialog buildDialog() {
         Bundle args = getArguments();
 
-        final DialogItems dialogItems = args.getParcelable(ARG_KEY_DIALOG_ITEMS);
-        int displayOrientation = args.getInt(ARG_DISPLAY_ORIENTATION);
+        try {
+            final DialogItems dialogItems = args.getParcelable(ARG_KEY_DIALOG_ITEMS);
+            int displayOrientation = args.getInt(ARG_DISPLAY_ORIENTATION);
 
-        BaseCustomDialog.Builder builder = new BaseCustomDialog.Builder(getActivity());
-        String title = dialogItems.getTitle();
-        boolean showTitle = dialogItems.isShowTitle();
+            BaseCustomDialog.Builder builder = new BaseCustomDialog.Builder(getActivity());
+            String title = dialogItems.getTitle();
+            boolean showTitle = dialogItems.isShowTitle();
 
-        if(showTitle) {
-            int titleImgResId = R.drawable.ic_launcher_round;
-            builder.setTitle(title, titleImgResId);
-        } else {
-            builder.setTitleBarHidden();
-        }
+            if (showTitle) {
+                int titleImgResId = R.drawable.ic_launcher_round;
+                builder.setTitle(title, titleImgResId);
+            } else {
+                builder.setTitleBarHidden();
+            }
 
-        if(dialogItems.getContentMessage() != null) {
-            builder.setMessage(dialogItems.getContentMessage());
-        } else {
-            // 커스텀뷰 inflater 와 초기화 로직을 받는다.
-            builder.setView(dialogItems.getCustomViewInflater().getDialogCustomViewInflater().inflateContentView());
-        }
+            if (dialogItems.getContentMessage() != null) {
+                builder.setMessage(dialogItems.getContentMessage());
+            } else {
+                // 커스텀뷰 inflater 와 초기화 로직을 받는다.
+                builder.setView(dialogItems.getCustomViewInflater().getDialogCustomViewInflater().inflateContentView());
+            }
 
-        builder.setDismissOnButtonClick(args.getBoolean(ARG_KEY_IS_DISMISS_ON_BUTTON_CLICK));
+            builder.setDismissOnButtonClick(args.getBoolean(ARG_KEY_IS_DISMISS_ON_BUTTON_CLICK));
 
-        if(dialogItems.getPositiveButtonText() != null) {
-            builder.setPositiveButton(dialogItems.getPositiveButtonText(), new DialogInterface.OnClickListener() {
+            if (dialogItems.getPositiveButtonText() != null) {
+                builder.setPositiveButton(dialogItems.getPositiveButtonText(), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AbstractDialogButtonClickListener positiveButtonClickListener = dialogItems.getPositiveButtonClickListener();
+                        if (positiveButtonClickListener != null)
+                            positiveButtonClickListener.onClick(Dialog.BUTTON_POSITIVE);
+                    }
+                });
+            }
+
+            if (dialogItems.getNeutralButtonText() != null) {
+                builder.setNeutralButton(dialogItems.getNeutralButtonText(), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AbstractDialogButtonClickListener neutralButtonClickListener = dialogItems.getNeutralButtonClickListener();
+                        if (neutralButtonClickListener != null)
+                            neutralButtonClickListener.onClick(Dialog.BUTTON_NEUTRAL);
+                    }
+                });
+            }
+
+            if (dialogItems.getNegativeButtonText() != null) {
+                builder.setNegativeButton(dialogItems.getNegativeButtonText(), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        AbstractDialogButtonClickListener negativeButtonClickListener = dialogItems.getNegativeButtonClickListener();
+                        if (negativeButtonClickListener != null)
+                            negativeButtonClickListener.onClick(Dialog.BUTTON_NEGATIVE);
+                    }
+                });
+            }
+
+            builder.setCloseButton(dialogItems.isShowCloseButton(), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    AbstractDialogButtonClickListener positiveButtonClickListener = dialogItems.getPositiveButtonClickListener();
-                    if(positiveButtonClickListener != null)
-                        positiveButtonClickListener.onClick(Dialog.BUTTON_POSITIVE);
+                    dialog.dismiss();
+
+                    AbstractDialogButtonClickListener closeButtonClickListener = dialogItems.getCloseButtonClickListener();
+                    if (closeButtonClickListener != null)
+                        closeButtonClickListener.onClick(BUTTON_CLOSE);
                 }
             });
-        }
 
-        if(dialogItems.getNeutralButtonText() != null) {
-            builder.setNeutralButton(dialogItems.getNeutralButtonText(), new DialogInterface.OnClickListener() {
+            setCancelable(dialogItems.isCancelable());
+            builder.setDisplayOrientation(dialogItems.getDisplayOrientation());
+
+            BaseCustomDialog dialog = builder.create();
+            dialog.setOnShowListener(mOnShowListener);
+            dialog.setOnDismissListener(mOnDismissListener != null ? mOnDismissListener : new DialogInterface.OnDismissListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    AbstractDialogButtonClickListener neutralButtonClickListener = dialogItems.getNeutralButtonClickListener();
-                    if(neutralButtonClickListener != null)
-                        neutralButtonClickListener.onClick(Dialog.BUTTON_NEUTRAL);
+                public void onDismiss(DialogInterface dialogInterface) {
+                    // dialog 가 dismiss 가 되면 CustomDialogFragment 자체도 Fragment 라이프사이클에서 제거되어야함
+                    MyLog.i();
+                    removeThis();
                 }
             });
-        }
 
-        if(dialogItems.getNegativeButtonText() != null) {
-            builder.setNegativeButton(dialogItems.getNegativeButtonText(), new DialogInterface.OnClickListener() {
+            dialog.setCancelable(dialogItems.isCancelable());
+            dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    AbstractDialogButtonClickListener negativeButtonClickListener = dialogItems.getNegativeButtonClickListener();
-                    if(negativeButtonClickListener != null)
-                        negativeButtonClickListener.onClick(Dialog.BUTTON_NEGATIVE);
+                public void onCancel(DialogInterface dialogInterface) {
+                    dismiss();
                 }
             });
+
+            return dialog;
+        } catch (BadParcelableException e) {
+            e.printStackTrace();
         }
 
-        builder.setCloseButton(dialogItems.isShowCloseButton(), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-
-                AbstractDialogButtonClickListener closeButtonClickListener = dialogItems.getCloseButtonClickListener();
-                if(closeButtonClickListener != null)
-                    closeButtonClickListener.onClick(BUTTON_CLOSE);
-            }
-        });
-
-        setCancelable(dialogItems.isCancelable());
-        builder.setDisplayOrientation(dialogItems.getDisplayOrientation());
-
-        BaseCustomDialog dialog = builder.create();
-        dialog.setOnShowListener(mOnShowListener);
-        dialog.setOnDismissListener(mOnDismissListener != null ? mOnDismissListener : new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                // dialog 가 dismiss 가 되면 CustomDialogFragment 자체도 Fragment 라이프사이클에서 제거되어야함
-                MyLog.i();
-                removeThis();
-            }
-        });
-
-        dialog.setCancelable(dialogItems.isCancelable());
-        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                dismiss();
-            }
-        });
-
-        return dialog;
+        return null;
     }
 
     @Override

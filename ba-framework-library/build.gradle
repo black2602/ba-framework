@@ -36,15 +36,17 @@ android {
     }
 
     // 샘플앱으로 실행시킬때 필요함 (bintrayUpload 는 productFlavor 설정시 동작안함)
-    flavorDimensions "full"
-    productFlavors {
-        library {
-            flavorDimensions ""
-        }
+    if(isSampleApp) {
+        flavorDimensions "full"
+        productFlavors {
+            library {
+                flavorDimensions "full"
+            }
 
-        sample {
-            if(isSampleApp)
-                applicationIdSuffix ".sample"
+            sample {
+                if (isSampleApp)
+                    applicationIdSuffix ".sample"
+            }
         }
     }
 

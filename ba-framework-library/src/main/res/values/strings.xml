@@ -53,8 +53,13 @@
     <string name="jibun_addr_label">지번 : </string>
     <string name="jibun_addr_format" formatted="false">지번 : %s</string>
     <string name="addr_input_validation_error">검색할 주소는 1자 이상 입력해주세요.</string>
+
+
     <string name="next">다음</string>
     <string name="permission_access">권한 접근</string>
     <string name="rearrange">재배열</string>
+
+    <string name="NOT_SAFE_SSL_SERVER">이 사이트의 보안 인증서는 신뢰할 수 없습니다.\n계속하시겠습니까?</string>
+    <string name="CONTINUE">계속</string>
 
 </resources>

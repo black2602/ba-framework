@@ -189,12 +189,24 @@ public class LabelInputView extends RelativeLayout implements View.OnFocusChange
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-//        mInput.setEnabled(enabled);
+
+        // enabled == false 이면 입력불가능, 밑줄도 사라짐
+        mInput.setEnabled(enabled);
         mInput.setActivated(enabled);
     }
 
     public void setText(String text) {
         mInput.setText(text);
+    }
+
+    /**
+     * 텍스트를 설정하고 입력을 막는다.
+     * 밑줄은 표시됨
+     */
+    public void setTextWithLock(String text) {
+        mInput.setText(text);
+        mInput.setEnabled(false);
+        mInput.setActivated(true);
     }
 
     public Editable getText() {
@@ -224,7 +236,7 @@ public class LabelInputView extends RelativeLayout implements View.OnFocusChange
                 mInput.setInputType(InputType.TYPE_CLASS_TEXT);
                 break;
             case 1:     // 숫자
-                mInput.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL| InputType.TYPE_NUMBER_FLAG_SIGNED| InputType.TYPE_CLASS_NUMBER);
+                mInput.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_NUMBER_FLAG_SIGNED|InputType.TYPE_CLASS_NUMBER);
                 break;
             case 2:     // 전화번호
                 mInput.setInputType(InputType.TYPE_CLASS_PHONE);

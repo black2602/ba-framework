@@ -31,13 +31,14 @@ import com.blackangel.baframework.ui.dialog.AlertDialogFragment;
 import com.blackangel.baframework.ui.dialog.DialogClickListener;
 import com.blackangel.baframework.ui.dialog.PermissionConfirmationDialog;
 import com.blackangel.baframework.ui.dialog.custom.CustomDialogFragment;
+import com.blackangel.baframework.ui.dialog.custom.DialogButtonClickListener;
 import com.blackangel.baframework.ui.dialog.custom.DialogItems;
 import com.blackangel.baframework.util.BuildUtil;
 
 /**
  * Created by KimJeongHun on 2016-05-19.
  */
-public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuItemClickListener, ApiProgressListener {
+public class BaseActivity extends AppCompatActivity implements ApiProgressListener {
     protected final String TAG = this.getClass().getSimpleName();
 
     protected Toolbar mToolbar;
@@ -57,11 +58,16 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     protected void onCreate(Bundle savedInstanceState) {
         MyLog.i(TAG, "onCreate savedInstanceState=" + savedInstanceState);
         super.onCreate(savedInstanceState);
+        onPreCreateContentView();
         super.setContentView(R.layout.activity_base);
         initToolbar();
 
         mRootLayout = (ViewGroup) findViewById(R.id.layout_activity_root);
         mContentsLayout = (ViewGroup) findViewById(R.id.layout_activity_contents);
+    }
+
+    protected void onPreCreateContentView() {
+        MyLog.i(this.getClass().getSimpleName());
     }
 
     @Override
@@ -78,7 +84,7 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
             actionBar.setDisplayHomeAsUpEnabled(true);
 //            actionBar.setDefaultDisplayHomeAsUpEnabled(true);
-            mToolbar.setOnMenuItemClickListener(this);
+//            mToolbar.setOnMenuItemClickListener(this);
         }
     }
 
@@ -94,6 +100,38 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     protected void initToolbar(View.OnClickListener naviClick) {
         if(mToolbar != null) {
             mToolbar.setNavigationOnClickListener(naviClick);
+        }
+    }
+
+    protected void initToolbar(boolean showBack) {
+        if(mToolbar != null) {
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(showBack);
+        }
+    }
+
+    protected void initToolbar(String title, View.OnClickListener naviClick) {
+        if(mToolbar != null) {
+            mToolbar.setTitle(title);
+            mToolbar.setNavigationOnClickListener(naviClick);
+        }
+    }
+
+    protected void initToolbar(String title, boolean showBack) {
+        if(mToolbar != null) {
+            mToolbar.setTitle(title);
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(showBack);
+        }
+    }
+
+    protected void initToolbar(String title, boolean showBack, View.OnClickListener naviClick) {
+        if(mToolbar != null) {
+            mToolbar.setTitle(title);
+            mToolbar.setNavigationOnClickListener(naviClick);
+
+            ActionBar actionBar = getSupportActionBar();
+            actionBar.setDisplayHomeAsUpEnabled(showBack);
         }
     }
 
@@ -323,6 +361,36 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         showAlertDialog(msg, null);
     }
 
+    public void showYesNoDialog(int msgResId, int positiveBtnMsgId, int negativeBtnMsgId, DialogButtonClickListener dialogButtonClickListener) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msgResId)
+                .setPositiveButton(positiveBtnMsgId, dialogButtonClickListener)
+                .setNegativeButton(negativeBtnMsgId, dialogButtonClickListener)
+                .build();
+
+        showCustomDialog(dialogItems);
+    }
+
+    public void showYesNoDialog(String msg, int positiveMsgId, int negativeMsgId, DialogButtonClickListener dialogButtonClickListener) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msg)
+                .setPositiveButton(positiveMsgId, dialogButtonClickListener)
+                .setNegativeButton(negativeMsgId, dialogButtonClickListener)
+                .build();
+
+        showCustomDialog(dialogItems);
+    }
+
+    public void showYesNoDialogNotCancelable(String msg, int positiveMsgId, int negativeMsgId, DialogButtonClickListener dialogButtonClickListener) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msg)
+                .setPositiveButton(positiveMsgId, dialogButtonClickListener)
+                .setNegativeButton(negativeMsgId, dialogButtonClickListener)
+                .setCancelable(false)
+                .build();
+
+        showCustomDialog(dialogItems);
+    }
 
     private void showDialogFragment(DialogFragment dialogFragment, String tag) {
         FragmentManager fm = getSupportFragmentManager();
@@ -420,17 +488,6 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
 
     public void showToast(int msgResId) {
         Toast.makeText(this, msgResId, Toast.LENGTH_LONG).show();
-    }
-
-    /**
-     * 툴바 메뉴 아이템 클릭 콜백
-     * 툴바가 있을 때는 이 메소드를 오버라이드 한다.
-     * @param item
-     * @return
-     */
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        return false;
     }
 
     @Override

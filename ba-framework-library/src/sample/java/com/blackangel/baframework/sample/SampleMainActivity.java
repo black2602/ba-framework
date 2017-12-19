@@ -1,10 +1,13 @@
 package com.blackangel.baframework.sample;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.blackangel.baframework.R;
 import com.blackangel.baframework.core.base.BaseMainActivity;
+import com.blackangel.baframework.core.base.BaseWebActivity;
+import com.blackangel.baframework.intent.IntentConst;
 import com.blackangel.baframework.logger.MyLog;
 import com.blackangel.baframework.sns.FacebookUtil;
 import com.blackangel.baframework.sns.ISnsLoginParam;
@@ -44,6 +47,13 @@ public class SampleMainActivity extends BaseMainActivity {
                 }
             });
         }
+
+        Intent intent = new Intent(this, BaseWebActivity.class);
+        intent.putExtra(IntentConst.KEY_TITLE, "ReLe 관리자");
+        intent.putExtra(IntentConst.KEY_IS_AVAILABLE_LANDSCAPE, true);
+        intent.setData(Uri.parse("http://sandbox.f-mt.co.kr:9100/login"));
+        startActivity(intent);
+        finish();
     }
 
     @Override

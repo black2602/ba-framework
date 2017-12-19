@@ -217,7 +217,7 @@ public class BaseImageEditActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean onMenuItemClick(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.menu_complete) {
             // 완료 버튼
             if (mPreviewsFragment.isLoadingPreviewImage()) {

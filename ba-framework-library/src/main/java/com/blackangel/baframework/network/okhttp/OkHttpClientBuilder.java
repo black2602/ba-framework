@@ -106,10 +106,7 @@ public class OkHttpClientBuilder {
                     .readTimeout(timeout, TimeUnit.SECONDS)
                     .writeTimeout(timeout, TimeUnit.SECONDS);
 
-            if(ApiInfo.APP_SERVER_URL.startsWith("https")) {
-                if(httpsInfo == null)
-                    throw new IllegalArgumentException("HttpsInfo must be not null");
-
+            if(ApiInfo.APP_SERVER_URL.startsWith("https") && httpsInfo != null) {
                 ConnectionSpec.Builder connectionSpecBuilder = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
                         .allEnabledCipherSuites().allEnabledTlsVersions();
 
@@ -118,15 +115,15 @@ public class OkHttpClientBuilder {
 
                 MyLog.i("MyApplication.sX509TrustManager = " + httpsInfo.getTrustManager().getClass().getName());
                 builder.sslSocketFactory(httpsInfo.getSSLContext().getSocketFactory(), (X509TrustManager) httpsInfo.getTrustManager());
-            }
 
-            builder.hostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    MyLog.i("hostName = " + hostname);
-                    return ApiInfo.APP_SERVER_URL.contains(hostname);
-                }
-            });
+                builder.hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        MyLog.i("hostName = " + hostname);
+                        return ApiInfo.APP_SERVER_URL.contains(hostname);
+                    }
+                });
+            }
 
             if(isLogging) {
                 builder.addInterceptor(loggingInterceptor);
@@ -143,17 +140,16 @@ public class OkHttpClientBuilder {
                     .readTimeout(timeout, TimeUnit.SECONDS)
                     .writeTimeout(timeout, TimeUnit.SECONDS);
 
-            if(ApiInfo.APP_SERVER_URL.startsWith("https")) {
+            if(ApiInfo.APP_SERVER_URL.startsWith("https") && httpsInfo != null) {
                 builder.sslSocketFactory(httpsInfo.getSSLContext().getSocketFactory(), (X509TrustManager) httpsInfo.getTrustManager());
+                builder.hostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String hostname, SSLSession session) {
+                        MyLog.i("hostName = " + hostname);
+                        return ApiInfo.APP_SERVER_URL.contains(hostname);
+                    }
+                });
             }
-
-            builder.hostnameVerifier(new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    MyLog.i("hostName = " + hostname);
-                    return ApiInfo.APP_SERVER_URL.contains(hostname);
-                }
-            });
 
             if(isLogging) {
                 builder.addInterceptor(loggingInterceptor);

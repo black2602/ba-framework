@@ -4,4 +4,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <application>
+        <activity
+            android:name=".core.base.BaseWebActivity"
+            android:screenOrientation="sensor"
+            android:configChanges="orientation|screenSize"/>
+    </application>
 </manifest>
