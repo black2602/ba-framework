@@ -79,11 +79,10 @@ public class BaseActivity extends AppCompatActivity implements ApiProgressListen
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         if(mToolbar != null) {
             setSupportActionBar(mToolbar);
-
             ActionBar actionBar = getSupportActionBar();
-
             actionBar.setDisplayHomeAsUpEnabled(true);
-//            actionBar.setDefaultDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+
 //            mToolbar.setOnMenuItemClickListener(this);
         }
     }
@@ -492,11 +491,15 @@ public class BaseActivity extends AppCompatActivity implements ApiProgressListen
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        MyLog.i(this.getClass().getSimpleName());
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
                 if(getParent() != null) {
                     NavUtils.navigateUpFromSameTask(this);
+                    return true;
+                } else {
+                    finish();
                     return true;
                 }
         }

@@ -47,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.finger.rele.core.ui.view.DialogScrollView
+            <com.blackangel.baframework.ui.dialog.DialogScrollView
                 android:id="@+id/dialog_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-            </com.finger.rele.core.ui.view.DialogScrollView>
+            </com.blackangel.baframework.ui.dialog.DialogScrollView>
 
         </LinearLayout>
 

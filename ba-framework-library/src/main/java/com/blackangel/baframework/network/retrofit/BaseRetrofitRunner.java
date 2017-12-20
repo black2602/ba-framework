@@ -41,6 +41,59 @@ public class BaseRetrofitRunner {
                 .build();
     }
 
+    public static <T> T executeSync(@NonNull final ApiProgressListener apiProgressListener, final boolean showProgress, Call<T> call) {
+        try {
+            Response<T> response = call.execute();
+
+            MyLog.i("http response code = " + response.code() + ", response=" + response.toString());
+
+            if(response.isSuccessful()) {
+                if (response.body() != null) {
+                    T t = response.body();
+                    MyLog.i("responseBody=" + t);
+
+                    return t;
+
+                } else {
+                    // body is null
+                    MyLog.w("body is null");
+                }
+            } else {
+                int errCode = response.code();
+                String errMessage = response.message();
+
+                if(errMessage.isEmpty()) {
+                    String errJson;
+                    try {
+                        errJson = StringUtil.getStringFromInputStream(response.errorBody().byteStream());
+
+                        if(apiProgressListener.isGlobalError(errCode)) {
+                            apiProgressListener.onGlobalErrorResponse(errCode, errMessage, errJson);
+                            return null;
+                        }
+
+                    } catch (JsonSyntaxException | NullPointerException e) {
+                        e.printStackTrace();
+                        errMessage = e.getMessage();
+                    }
+                }
+
+//                apiModelResultListener.onFail(call.request().url().toString(), errCode, errMessage, new Throwable(errMessage));
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+            e.printStackTrace();
+            MyLog.e("errMesage=" + e.getMessage());
+
+            apiProgressListener.onGlobalErrorResponse(ErrorCode.ERROR_CODE_NETWORK_ERROR, e.getMessage());
+        }
+
+        return null;
+    }
+
     public static <T> void executeAsync(@NonNull final ApiProgressListener apiProgressListener, final boolean showProgress, Call<T> call,
                                         final ApiModelResultListener<T> apiModelResultListener) {
         if(showProgress)

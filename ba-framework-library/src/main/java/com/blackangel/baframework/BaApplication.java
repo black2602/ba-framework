@@ -21,6 +21,8 @@ public abstract class BaApplication extends Application {
         instance = this;
 
         ApiInfo.APP_SERVER_URL = getAppServerUrl();
+
+        initPreferenceManager();
     }
 
     protected abstract String getAppServerUrl();
@@ -29,7 +31,7 @@ public abstract class BaApplication extends Application {
         return instance;
     }
 
-    public static MyPreferenceManager getPreferenceManager() {
+    public static MyPreferenceManager initPreferenceManager() {
         if(sMyPreferenceManager == null)
             sMyPreferenceManager = MyPreferenceManager.getInstance(instance);
 

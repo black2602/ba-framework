@@ -1,5 +1,6 @@
 package com.blackangel.baframework.util;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -13,6 +14,7 @@ import android.os.Environment;
 import android.widget.Toast;
 
 import com.blackangel.baframework.R;
+import com.blackangel.baframework.intent.IntentConst;
 import com.blackangel.baframework.logger.MyLog;
 
 import java.io.File;
@@ -138,6 +140,13 @@ public class MyPackageManager {
         context.startActivity(intent);
     }
 
+    public static void executeImageFileChooser(Activity activity) {
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("image/*");
+        activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), IntentConst.REQUEST_FILE_CHOOSE);
+    }
+
     /**
      * 현재 실행중인 액티비티를 검색
      *
@@ -252,5 +261,22 @@ public class MyPackageManager {
         } catch (ActivityNotFoundException e) {
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + id)));
         }
+    }
+
+    public static int getSdkVersion(Context context) {
+        int version = 0;
+        PackageManager pm = context.getPackageManager();
+        try {
+            ApplicationInfo applicationInfo = null;
+            applicationInfo = pm.getApplicationInfo(context.getPackageName(), 0);
+
+            if (applicationInfo != null) {
+                version = applicationInfo.targetSdkVersion;
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return version;
     }
 }
