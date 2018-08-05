@@ -46,8 +46,8 @@ public class LoadingProgressDialog extends ProgressDialog {
         setCanceledOnTouchOutside(false);
 
         mContentView = View.inflate(mContext, R.layout.progress_dialog, null);
-        mLoadingImage = (ImageView) mContentView.findViewById(R.id.progress_loading);
-        mTxtMessage = (TextView) mContentView.findViewById(R.id.message);
+//        mLoadingImage = (ImageView) mContentView.findViewById(R.id.progress_loading);
+//        mTxtMessage = (TextView) mContentView.findViewById(R.id.message);
     }
 
     @Override

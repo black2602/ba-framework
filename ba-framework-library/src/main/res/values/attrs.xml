@@ -14,5 +14,6 @@
         <attr name="textSize" format="dimension" />
         <attr name="labelTextSize" format="dimension" />
         <attr name="multiline" format="boolean" />
+        <attr name="isLabelAnimate" format="boolean" />
     </declare-styleable>
 </resources>

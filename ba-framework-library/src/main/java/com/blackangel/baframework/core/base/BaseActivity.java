@@ -25,13 +25,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.blackangel.baframework.R;
+import com.blackangel.baframework.app.constants.AppErrorCode;
+import com.blackangel.baframework.core.model.BaseError;
 import com.blackangel.baframework.logger.MyLog;
 import com.blackangel.baframework.network.ApiProgressListener;
-import com.blackangel.baframework.ui.dialog.AlertDialogFragment;
-import com.blackangel.baframework.ui.dialog.DialogClickListener;
 import com.blackangel.baframework.ui.dialog.PermissionConfirmationDialog;
+import com.blackangel.baframework.ui.dialog.custom.AlertDialogFragment;
 import com.blackangel.baframework.ui.dialog.custom.CustomDialogFragment;
 import com.blackangel.baframework.ui.dialog.custom.DialogItems;
+import com.blackangel.baframework.ui.dialog.custom.DialogListeners;
 import com.blackangel.baframework.util.BuildUtil;
 
 /**
@@ -292,27 +294,37 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         }
     }
 
-    public void showOkDialog(int strResId) {
-        this.showOkDialog(getString(strResId));
+    public void showErrorDialog(String message) {
+        showErrorDialog(message, true, null);
     }
 
-    public void showOkDialog(String message) {
-        AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance(null, message);
-        showDialogFragment(dialogFragment, "okDlg");
+    public void showErrorDialogNotCancelable(String message,
+                                             DialogInterface.OnClickListener buttonClickListener) {
+        showErrorDialog(message, false, buttonClickListener);
     }
 
-    public void showAlertDialog(int msgResId, DialogClickListener positiveClick) {
-        this.showAlertDialog(getString(msgResId), positiveClick);
+    public void showErrorDialog(String message, boolean cancelable) {
+        showErrorDialog(message, cancelable, null);
     }
 
-    public void showAlertDialog(String message, DialogClickListener positiveClick) {
-        AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance(null, message, positiveClick);
-        showDialogFragment(dialogFragment, "altDlgWithPosi");
+    public void showErrorDialogOnClickFinish(int msgResId) {
+        showErrorDialogOnClickFinish(getString(msgResId));
     }
 
-    public void showAlertDialogNotCancelable(int msgResId, DialogClickListener positiveClick) {
-        AlertDialogFragment dialogFragment = AlertDialogFragment.newInstance(null, getString(msgResId), true, positiveClick);
-        showDialogFragment(dialogFragment, "altDlgWithPosiNotCancel");
+    public void showErrorDialogOnClickFinish(String msg) {
+        AlertDialogFragment alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.alert), msg,
+                false);
+
+        showGlobalAlertDialog(alertDialogFragment, alertDialogFragment.getClass().getSimpleName(),
+                (dialog, which) -> finish());
+    }
+
+    public void showErrorDialog(String message, boolean cancelable,
+                                DialogInterface.OnClickListener onClickListener) {
+        AlertDialogFragment alertDialogFragment = AlertDialogFragment.newInstance(getString(R.string.alert), message,
+                cancelable);
+
+        showGlobalAlertDialog(alertDialogFragment, alertDialogFragment.getClass().getSimpleName(), onClickListener);
     }
 
     public void showAlertDialog(int msgResId) {
@@ -323,57 +335,217 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         showAlertDialog(msg, null);
     }
 
-
-    private void showDialogFragment(DialogFragment dialogFragment, String tag) {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-
-        ft.add(dialogFragment, tag);
-        ft.commitAllowingStateLoss();
+    protected void showAlertDialogNotCancelable(String msg) {
+        showAlertDialogNotCancelable(msg, (DialogInterface.OnClickListener) null);
     }
 
+    protected void showAlertDialog(String msg, DialogInterface.OnClickListener onOKClick) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msg)
+                .setPositiveButton(android.R.string.ok)
+                .build();
 
-    public void showCustomDialog(DialogItems dialogItems) {
-        this.showCustomDialog(dialogItems, CustomDialogFragment.class.getSimpleName());
+        showCustomDialog(dialogItems, onOKClick);
     }
 
-    public void showCustomDialog(DialogItems dialogItems, String tag) {
-        if(!isFinishing()) {
-            CustomDialogFragment customDialog;
+    public void showAlertDialogNotCancelable(int msgResId, DialogInterface.OnClickListener onOKClick) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msgResId)
+                .setPositiveButton(android.R.string.ok)
+                .setCancelable(false)
+                .build();
 
+        showCustomDialog(dialogItems, onOKClick);
+    }
+
+    public void showAlertDialogNotCancelable(String msg, DialogInterface.OnClickListener btnClickListener) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msg)
+                .setPositiveButton(android.R.string.ok)
+                .setCancelable(false)
+                .build();
+
+        showCustomDialog(dialogItems, btnClickListener);
+    }
+
+    public void showAlertDialogNotCancelable(String msg, DialogInterface.OnShowListener onShowListener) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msg)
+                .setPositiveButton(android.R.string.ok)
+                .setCancelable(false)
+                .build();
+
+        showCustomDialog(dialogItems, onShowListener, null);
+    }
+
+    public void showAlertDialogNotCancelable(String msg, DialogInterface.OnShowListener onShowListener, DialogInterface.OnClickListener onBtnClickListener) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msg)
+                .setPositiveButton(android.R.string.ok)
+                .setCancelable(false)
+                .build();
+
+        showCustomDialog(dialogItems, onShowListener, onBtnClickListener);
+    }
+
+    public void showAlertDialogOnClickFinish(String msg) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msg)
+                .setPositiveButton(android.R.string.ok)
+                .setCancelable(false)
+                .build();
+
+        showCustomDialog(dialogItems, (dialog, which) -> finish());
+    }
+
+    public void showAlertDialogOnClickFinish(int msgResId) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msgResId)
+                .setPositiveButton(android.R.string.ok)
+                .setCancelable(false)
+                .build();
+
+        showCustomDialog(dialogItems, (dialog, which) -> finish());
+    }
+
+    public void showYesNoDialog(int msgResId, int positiveBtnMsgId, int negativeBtnMsgId,
+                                DialogInterface.OnClickListener dialogButtonClickListener) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msgResId)
+                .setPositiveButton(positiveBtnMsgId)
+                .setNegativeButton(negativeBtnMsgId)
+                .build();
+
+        showCustomDialog(dialogItems, dialogButtonClickListener);
+    }
+
+    public void showYesNoDialog(String msg, int positiveMsgId, int negativeMsgId, DialogInterface.OnClickListener dialogButtonClickListener) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msg)
+                .setPositiveButton(positiveMsgId)
+                .setNegativeButton(negativeMsgId)
+                .build();
+
+        showCustomDialog(dialogItems, dialogButtonClickListener);
+    }
+
+    public void showYesNoDialogNotCancelable(int msgResId, int positiveMsgId, int negativeMsgId, DialogInterface.OnClickListener dialogButtonClickListener) {
+        showYesNoDialogNotCancelable(getString(msgResId), positiveMsgId, negativeMsgId, dialogButtonClickListener);
+    }
+
+    public void showYesNoDialogNotCancelable(String msg, int positiveMsgId, int negativeMsgId, DialogInterface.OnClickListener dialogButtonClickListener) {
+        DialogItems dialogItems = new DialogItems.Builder(this)
+                .setContentMessage(msg)
+                .setPositiveButton(positiveMsgId)
+                .setNegativeButton(negativeMsgId)
+                .setCancelable(false)
+                .build();
+
+        showCustomDialog(dialogItems, dialogButtonClickListener);
+    }
+
+    public void showCustomDialog(DialogItems dialogItems, String tag, DialogInterface.OnClickListener btnClickListener) {
+        DialogListeners dialogListeners = new DialogListeners.Builder()
+                .setButtonClickListener(btnClickListener)
+                .build();
+
+        this.showCustomDialog(tag, dialogItems, dialogListeners);
+    }
+
+    public void showCustomDialog(DialogItems dialogItems, String tag,
+                                 DialogInterface.OnClickListener btnClickListener,
+                                 DialogInterface.OnDismissListener onDismissListener) {
+
+        DialogListeners dialogListeners = new DialogListeners.Builder()
+                .setButtonClickListener(btnClickListener)
+                .setOnDismissListener(onDismissListener)
+                .build();
+
+        this.showCustomDialog(tag, dialogItems, dialogListeners);
+    }
+
+    public void showCustomDialog(DialogItems dialogItems, DialogInterface.OnClickListener btnClickListener) {
+        DialogListeners dialogListeners = new DialogListeners.Builder()
+                .setButtonClickListener(btnClickListener)
+                .build();
+
+        this.showCustomDialog(dialogItems, dialogListeners);
+    }
+
+    public void showCustomDialog(DialogItems dialogItems, DialogInterface.OnShowListener onShowListener,
+                                 DialogInterface.OnClickListener btnClickListener) {
+        DialogListeners dialogListeners = new DialogListeners.Builder()
+                .setButtonClickListener(btnClickListener)
+                .setOnShowListener(onShowListener)
+                .build();
+
+        this.showCustomDialog(dialogItems, dialogListeners);
+    }
+
+    public void showCustomDialog(DialogItems dialogItems, DialogListeners dialogListeners) {
+        showCustomDialog(CustomDialogFragment.TAG, dialogItems, dialogListeners);
+    }
+
+    public void showCustomDialog(String tag, DialogItems dialogItems, @NonNull DialogListeners dialogListeners) {
+        CustomDialogFragment customDialog = CustomDialogFragment.newInstance(dialogItems);
+        customDialog.setDialogCustomViewInflater(dialogListeners.getDialogCustomViewInflater());
+        customDialog.setButtonClickListener(dialogListeners.getButtonClickListener());
+        customDialog.setOnShowListener(dialogListeners.getOnShowListener());
+        customDialog.setOnDismissListener(dialogListeners.getOnDismissListener());
+
+        showCustomDialogInternal(customDialog, tag);
+    }
+
+    private void showCustomDialogInternal(CustomDialogFragment customDialog, String tag) {
+        if (!isFinishing()) {
             FragmentManager fm = getSupportFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-
             Fragment prev = fm.findFragmentByTag(tag);
-            if(prev != null) {
-                removeCustomDialog();
+
+//            if(prev != null) {
+//                CustomDialogFragment prevCustomDialog = (CustomDialogFragment) prev;
+//                try {
+//                    prevCustomDialog.dismissAllowingStateLoss();
+//                } catch (IllegalStateException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+
+            if (prev == null) {
+                MyLog.w(this.getClass().getSimpleName() + " " + tag + " dialog prev no exist " + System.currentTimeMillis());
+            } else {
+                MyLog.w(this.getClass().getSimpleName() + " " + tag + " dialog prev exist!! " + System.currentTimeMillis());
             }
 
-            customDialog = CustomDialogFragment.newInstance(dialogItems);
-            ft.add(customDialog, tag);
-            ft.commitAllowingStateLoss();
+            // 만약 기존에 떠있는 팝업이 있었다면 다시 띄우지 않는다.
+            if (prev == null) {
+                FragmentTransaction ft = fm.beginTransaction();
+                ft.add(customDialog, tag);
+                ft.commitNowAllowingStateLoss();
+                // uiThread 에서 동기화하여 커밋함. 이 때문에 팝업을 띄울때 조심해야함
+                // 프래그먼트 트랜잭션 이 완료되지 않았을때, (예를 들면 onActivityCreated 에서 바로)
+                // 팝업을 띄우려고 이 부분이 호출되면 크래쉬난다.
+                // 이를 피하려면 호출부에서 view.post() 메서드 안에서 호출하야한다.
+
+                MyLog.w(this.getClass().getSimpleName() + " " + tag + " dialog shown!! " + System.currentTimeMillis());
+            }
         }
     }
 
+    public void showCustomDialog(DialogItems dialogItems, String tag,
+                                 DialogInterface.OnDismissListener onDismissListener) {
+        DialogListeners dialogListeners = new DialogListeners.Builder()
+                .setOnDismissListener(onDismissListener)
+                .build();
 
-    public void showCustomDialog(DialogItems dialogItems, String tag, DialogInterface.OnDismissListener onDismissListener) {
-        if(!isFinishing()) {
-            CustomDialogFragment customDialog;
+        showCustomDialog(tag, dialogItems, dialogListeners);
+    }
 
-            FragmentManager fm = getSupportFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
+    public void showCustomDialog(DialogItems dialogItems, String tag, DialogInterface.OnShowListener onShowListener) {
+        DialogListeners dialogListeners = new DialogListeners.Builder()
+                .setOnShowListener(onShowListener)
+                .build();
 
-            Fragment prev = fm.findFragmentByTag(tag);
-            if(prev != null) {
-                removeCustomDialog();
-            }
-
-            customDialog = CustomDialogFragment.newInstance(dialogItems);
-            customDialog.setOnDismissListener(onDismissListener);
-
-            ft.add(customDialog, tag);
-            ft.commitAllowingStateLoss();
-        }
+        showCustomDialog(tag, dialogItems, dialogListeners);
     }
 
     public void showCustomDialog(CustomDialogFragment customDialogFragment) {
@@ -381,18 +553,53 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
     }
 
     public void showCustomDialog(CustomDialogFragment customDialogFragment, String tag) {
-        if(!isFinishing()) {
+        if (!isFinishing()) {
 
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
 
             Fragment prev = fm.findFragmentByTag(tag);
-            if(prev != null) {
-                removeCustomDialog();
+            if (prev != null) {
+//                removeCustomDialog(tag);
+                CustomDialogFragment customDialog = (CustomDialogFragment) prev;
+                try {
+                    customDialog.dismissAllowingStateLoss();
+                } catch (IllegalStateException e) {
+                    e.printStackTrace();
+                }
             }
 
             ft.add(customDialogFragment, tag);
-            ft.commitAllowingStateLoss();
+            ft.commitNowAllowingStateLoss();
+        }
+    }
+
+    public void showGlobalAlertDialog(AlertDialogFragment dialogFragment, String tag, DialogInterface.OnClickListener onClickListener) {
+        if (!isFinishing()) {
+            dialogFragment.setOnButtonClickListener(onClickListener);
+
+            try {
+                dialogFragment.show(getSupportFragmentManager(), tag);
+
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+
+                Fragment prev = fm.findFragmentByTag(tag);
+                if (prev != null) {
+                    DialogFragment prevDialogFragment = (DialogFragment) prev;
+                    try {
+                        prevDialogFragment.dismissAllowingStateLoss();
+                    } catch (IllegalStateException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+                ft.add(dialogFragment, tag);
+                ft.commitAllowingStateLoss();
+            }
         }
     }
 
@@ -407,12 +614,13 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         if (prev != null) {
             CustomDialogFragment customDialog = (CustomDialogFragment) prev;
             try {
-                customDialog.dismiss();
+                customDialog.dismissAllowingStateLoss();
             } catch (IllegalStateException e) {
                 e.printStackTrace();
             }
         }
     }
+
 
     public void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
@@ -520,14 +728,25 @@ public class BaseActivity extends AppCompatActivity implements Toolbar.OnMenuIte
         hideProgress();
     }
 
-    @Override
-    public void onGlobalErrorResponse(int errCode, String errMessage, Object... extras) {
+    /**
+     * 기본 글로벌 에러 핸들 로직 - 에러코드를 맵핑하여 사용자에게 보여줄 메시지를 다시 정의한 후 팝업만 띄운다.
+     * 다른 처리가 필요하면 오버라이드 하여 처리한다.
+     *
+     * @param globalError   액티비티단에서 공통으로 잡아서 처리해야할 글로벌 에러
+     * @param extras        추가적으로 넘어오는 파라미터
+     */
+    public void handleGlobalError(BaseError globalError, Object... extras) {
+        MyLog.i();
 
-    }
+        if (globalError.getErrCode() == AppErrorCode.ERROR_CODE_UNKNOWN) {
+            globalError.setErrMessage(getString(R.string.error_unknown));
 
-    @Override
-    public boolean isGlobalError(int errCode) {
-        return false;
+        } else if (globalError.getErrCode() == AppErrorCode.ERROR_CODE_NETWORK_ERROR
+                || globalError.getErrCode() == AppErrorCode.ERROR_CODE_BAD_GATE_WAY) {
+            globalError.setErrMessage(getString(R.string.error_not_connected_network));
+        }
+
+        showAlertDialog(globalError.getErrMessage());
     }
 
     public interface IntentExtraProvider {

@@ -146,5 +146,17 @@ public class StringUtil {
         String regularExpressionPassword = "(((?=.*[a-z])|(?=.*[A-Z])).{8,20})";
         /** 엔터가 포함되어 있지 않은 ""로 둘러 쌓여있는 문자열 */
         String regularExpressionWrodNotCR = "(\\\"[^\\\"\\r]+\\\")";
+
+        public static final String REGEX_ONLY_NUMBER = "^[0-9]*$";
+        public static final String REGEX_ONLY_NUMBER_AND_STAR = "^[0-9*]*$";
+        public static final String REGEX_ONLY_ENGLISH = "^[a-zA-Z]*$";
+        public static final String REGEX_ONLY_KOREAN = "^[ㄱ-ㅣ가-힣]*$";
+        public static final String REGEX_ONLY_ENGLISH_NUMBER = "^[a-zA-Z0-9]*$";
+        public static final String REGEX_ONLY_ENGLISH_NUMBER_SYMBOLS_ALLOW_SPACE = "^[a-zA-Z0-9 !@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?~`\\n]*$";
+        public static final String REGEX_ONLY_KOREAN_PHONE_NUMBER = "(01[016789])(\\d{3,4})(\\d{4})";
+        public static final String REGEX_ONLY_INTERNATIONAL_PHONE_NUMBER = "\\d{6,15}";     // (국가코드를 제외한) 국제전화 정규식 6~15자리 숫자
+        public static final String REGEX_ONLY_KOREAN_PHONE_NUMBER_WITH_DASH = "(01[016789])([\\d.-]+)";
+        public static final String REGEX_ONLY_EMAIL = "^[_A-Za-z0-9-]+(.[_A-Za-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
+
     }
 }

@@ -5,6 +5,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Build;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -389,6 +390,96 @@ public class AnimationUtil {
         view.post(new Runnable() {
             @Override
             public void run() {
+                view.startAnimation(anim);
+            }
+        });
+    }
+
+    public static void startSlideBottomInAnim(Context context, final View view) {
+        startSlideBottomInAnim(context, view, null);
+    }
+
+    public static void startSlideBottomInAnim(Context context, final View view, final Animation.AnimationListener externalAnimationListener) {
+        MyLog.i();
+        final Animation anim = AnimationUtils.loadAnimation(context, R.anim.slide_down_to_up_fade_in);
+        anim.setDuration(200);
+        anim.setInterpolator(new AccelerateInterpolator());
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                MyLog.d();
+                view.setVisibility(View.VISIBLE);
+                if(externalAnimationListener != null) {
+                    externalAnimationListener.onAnimationStart(animation);
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                MyLog.d();
+                if(externalAnimationListener != null) {
+                    externalAnimationListener.onAnimationEnd(animation);
+                }
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+                MyLog.d();
+                if(externalAnimationListener != null) {
+                    externalAnimationListener.onAnimationRepeat(animation);
+                }
+            }
+        });
+
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                MyLog.d();
+                view.startAnimation(anim);
+            }
+        });
+    }
+
+    public static void startSlideBottomOutAnim(Context context, final View view) {
+        startSlideBottomOutAnim(context, view, null);
+    }
+
+    public static void startSlideBottomOutAnim(Context context, final View view, final Animation.AnimationListener externalAnimationListener) {
+        MyLog.i();
+        final Animation anim = AnimationUtils.loadAnimation(context, R.anim.slide_up_to_down_fade_out);
+        anim.setDuration(200);
+        anim.setInterpolator(new AccelerateInterpolator());
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                MyLog.d();
+                if(externalAnimationListener != null) {
+                    externalAnimationListener.onAnimationStart(animation);
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                MyLog.d();
+                view.setVisibility(View.INVISIBLE);
+                if(externalAnimationListener != null) {
+                    externalAnimationListener.onAnimationEnd(animation);
+                }
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+                MyLog.d();
+                if(externalAnimationListener != null) {
+                    externalAnimationListener.onAnimationRepeat(animation);
+                }
+            }
+        });
+
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                MyLog.d();
                 view.startAnimation(anim);
             }
         });

@@ -123,8 +123,12 @@ public class PermissionConfirmationDialogFragment extends DialogFragment {
                         MyLog.e("퍼미션 접근 요청 거부함");
                         OnPermissionConfirmationDialogListener listener = null;
 
-                        if(getActivity() instanceof OnPermissionConfirmationDialogListener) {
+                        if(mTargetFragment instanceof OnPermissionConfirmationDialogListener) {
+                            listener = (OnPermissionConfirmationDialogListener) mTargetFragment;
+
+                        } else if(getActivity() instanceof OnPermissionConfirmationDialogListener) {
                             listener = (OnPermissionConfirmationDialogListener) getActivity();
+
                         } else if(mOnPermissionConfirmationDialogListener != null) {
                             listener = mOnPermissionConfirmationDialogListener;
                         }

@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +27,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -50,6 +53,56 @@ import java.util.regex.Pattern;
  * Created by KimJeongHun on 2016-05-04.
  */
 public class ViewUtil {
+    /**
+     * 특정 입력 EditText 에 대한 소프트 키보드를 띄운다.
+     * 안뜨는 경우는 호출부에서 postDelayed 로 지연을 주어 호출하면 뜬다.
+     */
+    public static void showSoftKeyboard(Context context, @NonNull EditText editText) {
+        InputMethodManager mgr = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(mgr != null)
+            mgr.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    public static boolean isVisibleSoftKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        if(imm != null) {
+            if (imm.isAcceptingText()) {
+                MyLog.d("Software Keyboard was shown");
+                return true;
+            } else {
+                MyLog.d("Software Keyboard was not shown");
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public static void setEditTextAllCaps(EditText editText) {
+        editText.setFilters(new InputFilter[] {new InputFilter.AllCaps()});
+    }
+
+    /**
+     *
+     * @param editText
+     * @param regex
+     * @param maxLength 0 보다 작으면 제한이 없다는 뜻
+     */
+    public static void setEditTextInputFilters(EditText editText, String regex, int maxLength) {
+        InputFilter regexFilter = (source, start, end, dest, dstart, dend) -> {
+            Pattern ps = Pattern.compile(regex);
+            if (!ps.matcher(source).matches()) {
+                return "";
+            }
+            return null;
+        };
+
+        editText.setFilters(new InputFilter[]{
+                regexFilter,
+                new InputFilter.LengthFilter(maxLength < 0 ? Integer.MAX_VALUE : maxLength)});
+    }
+
     public static void setEditTextPhoneDash(final EditText edit) {
         edit.addTextChangedListener(new TextWatcher() {
             String mPrevText;
@@ -575,5 +628,86 @@ public class ViewUtil {
 
     public interface ListViewNotScrollClickListener {
         void onListViewClickNotScroll();
+    }
+
+    public static class TextInputErrorWatcher implements TextWatcher {
+        private TextInputLayout mTextInputLayout;
+
+        public TextInputErrorWatcher(TextInputLayout textInputLayout) {
+            this.mTextInputLayout = textInputLayout;
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if(s.length() > 0) {
+                mTextInputLayout.setError(null);
+            }
+        }
+    }
+
+    private static final int KEYBOARD_HEIGHT = 300;
+    public static void addOnGlobalKeyboardStatusListener(View view, OnKeyboardGlobalLayoutListener onKeyboardGlobalLayoutListener) {
+        view.getViewTreeObserver().addOnGlobalLayoutListener(onKeyboardGlobalLayoutListener);
+    }
+    public static class OnKeyboardGlobalLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
+        private View mView;
+        private OnGlobalKeyboardStatusListener mOnGlobalKeyboardStatusListener;
+        private boolean mIsShownKeyboard;
+
+        public OnKeyboardGlobalLayoutListener(View view, OnGlobalKeyboardStatusListener onGlobalKeyboardStatusListener) {
+            mView = view;
+            mOnGlobalKeyboardStatusListener = onGlobalKeyboardStatusListener;
+            mIsShownKeyboard = false;
+        }
+
+        public boolean isShownKeyboard() {
+            return mIsShownKeyboard;
+        }
+
+        public void detach() {
+            mView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        }
+
+        @Override
+        public void onGlobalLayout() {
+            // 숨겨져 있는 뷰에는 글로벌 키보드 콜백을 전달할 필요 없음
+
+            Rect r = new Rect();
+            mView.getWindowVisibleDisplayFrame(r);
+
+            int heightDiff = mView.getRootView().getHeight() - (r.bottom - r.top);
+
+            if(heightDiff > KEYBOARD_HEIGHT) {
+                if(!mIsShownKeyboard) {
+                    if(mView.getVisibility() == View.VISIBLE)
+                        mOnGlobalKeyboardStatusListener.onShownSoftKeyboard();
+
+                    mIsShownKeyboard = true;
+                }
+            } else {
+                if(mIsShownKeyboard) {
+                    if(mView.getVisibility() == View.VISIBLE) {
+                        mOnGlobalKeyboardStatusListener.onHiddenSoftKeyboard();
+                    }
+
+                    mIsShownKeyboard = false;
+                }
+            }
+        }
+    };
+
+    public interface OnGlobalKeyboardStatusListener {
+        void onShownSoftKeyboard();
+        void onHiddenSoftKeyboard();
     }
 }

@@ -32,7 +32,7 @@ public abstract class BaseListFragment extends BaseFragment {
     protected RecyclerView mRecyclerView;
     protected MyRecyclerViewAdapter mRecyclerViewAdapter;
     protected LinearLayoutManager mLayoutManager;
-    protected ViewGroup mEmptyView;
+    protected ViewGroup mLayoutOverlayView;
 
     protected ListRowClicker mListRowClicker;
 
@@ -64,7 +64,7 @@ public abstract class BaseListFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_base_list, container, false);
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-        mEmptyView = (ViewGroup) view.findViewById(R.id.layout_empty_view);
+        mLayoutOverlayView = (ViewGroup) view.findViewById(R.id.layout_overlay_view);
         mRecyclerView.setHasFixedSize(true);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
@@ -113,11 +113,11 @@ public abstract class BaseListFragment extends BaseFragment {
     }
 
     protected void showEmptyLayout() {
-        if(mEmptyView.getChildCount() == 0) {
-            mEmptyView.addView(createEmptyView());
+        if(mLayoutOverlayView.getChildCount() == 0) {
+            mLayoutOverlayView.addView(createEmptyView());
         }
 
-        mEmptyView.setVisibility(View.VISIBLE);
+        mLayoutOverlayView.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
     }
 
@@ -182,8 +182,8 @@ public abstract class BaseListFragment extends BaseFragment {
 
         } else {
 
-            if(mEmptyView.getVisibility() == View.VISIBLE) {
-                mEmptyView.setVisibility(View.GONE);
+            if(mLayoutOverlayView.getVisibility() == View.VISIBLE) {
+                mLayoutOverlayView.setVisibility(View.GONE);
                 mRecyclerView.setVisibility(View.VISIBLE);
             }
 

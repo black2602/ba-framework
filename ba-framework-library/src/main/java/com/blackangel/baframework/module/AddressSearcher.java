@@ -3,21 +3,18 @@ package com.blackangel.baframework.module;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.blackangel.baframework.R;
 import com.blackangel.baframework.core.base.BaseActivity;
 import com.blackangel.baframework.core.base.BaseListFragment;
 import com.blackangel.baframework.logger.MyLog;
-import com.blackangel.baframework.ui.dialog.custom.AbstractDialogCustomViewInflater;
+import com.blackangel.baframework.ui.dialog.custom.CustomDialogFragment;
 import com.blackangel.baframework.ui.dialog.custom.DialogCustomViewInflater;
 import com.blackangel.baframework.ui.dialog.custom.DialogItems;
 import com.blackangel.baframework.ui.view.recyclerview.AbsRecyclerViewHolder;
@@ -79,9 +76,12 @@ public class AddressSearcher {
     public void showDialogSearchAddress(final OnAddressSelectedListener onAddressSelectedListener) {
         DialogItems dialogItems = new DialogItems.Builder(mActivity)
                 .setTitle(R.string.addr_search)
-                .setCustomViewInflater(new DialogCustomViewInflater(new AbstractDialogCustomViewInflater() {
-                    @Override
-                    public View inflateContentView() {
+                .build();
+
+        CustomDialogFragment customDialogFragment = CustomDialogFragment.newInstance(dialogItems, true);
+        customDialogFragment.setDialogCustomViewInflater(new DialogCustomViewInflater() {
+            @Override
+            public View inflateContentView() {
                         View view = mActivity.getLayoutInflater().inflate(R.layout.dialog_address_search, null);
 
                         mFragment = (AddressSearchFragment) mActivity.getSupportFragmentManager().findFragmentByTag(TAG_ADDRESS_SEARCH_FRAGMENT);
@@ -102,34 +102,28 @@ public class AddressSearcher {
 
                         return view;
                     }
-                }))
-                .build();
-//
-//        CustomDialogFragment customDialog = CustomDialogFragment.newInstance(dialogItems);
-//        customDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-//            @Override
-//            public void onDismiss(DialogInterface dialog) {
-//                MyLog.i();
-//                FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
-//                ft.remove(mFragment);
-//                ft.commitAllowingStateLoss();
-//
-//                mFragment = null;
-//            }
-//        });
-//        mActivity.showCustomDialog(dialogItems, TAG_SEARCH_ADDR);
+                });
 
-        mActivity.showCustomDialog(dialogItems, TAG_SEARCH_ADDR, new DialogInterface.OnDismissListener() {
+        customDialogFragment.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
-            public void onDismiss(DialogInterface dialog) {
-                MyLog.i();
-                FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction();
-                ft.remove(mFragment);
-                ft.commitAllowingStateLoss();
+            public void onShow(DialogInterface dialog) {
+                mFragment = AddressSearchFragment.newInstance();
+                mFragment.setOnAddressSelectedListener(onAddressSelectedListener);
+                MyLog.d("mFragment=" + mFragment);
 
-                mFragment = null;
+                if(customDialogFragment.getActivity() == null) {
+                    mEditSearch.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            customDialogFragment.addChildFragment(R.id.container_addr_search_fragment, mFragment, false);
+                        }
+                    }, 500);
+                } else {
+                    customDialogFragment.addChildFragment(R.id.container_addr_search_fragment, mFragment, false);
+                }
             }
         });
+        mActivity.showCustomDialog(customDialogFragment, TAG_SEARCH_ADDR);
     }
 
     public static class AddressSearchFragment extends BaseListFragment implements RecyclerViewAdapterHelper<List<Address>, Address>, BaseListFragment.ListRowClicker {
@@ -249,55 +243,55 @@ public class AddressSearcher {
 //        }
 
 
-        private DialogItems makeDialogItemAddressSelect(final Address addressInfo) {
-            final BaseActivity activity = (BaseActivity) getActivity();
-
-            DialogItems dialogItems = new DialogItems.Builder(activity)
-                    .setTitle(R.string.select_addr)
-                    .setCustomViewInflater(new DialogCustomViewInflater(new AbstractDialogCustomViewInflater() {
-                        @Override
-                        public View inflateContentView() {
-                            View customView = View.inflate(activity, R.layout.dialog_address_select_view, null);
-
-                            RadioGroup rg = (RadioGroup) customView.findViewById(R.id.rg_addr_select);
-                            RadioButton btnStreetAddr = (RadioButton) rg.findViewById(R.id.btn_street_addr);
-                            RadioButton btnJibunAddr = (RadioButton) rg.findViewById(R.id.btn_jibun_addr);
-
-                            btnStreetAddr.setText(String.format(activity.getString(R.string.street_addr_format), addressInfo.getStreetAddress()));
-                            btnJibunAddr.setText(String.format(activity.getString(R.string.jibun_addr_format), addressInfo.getLegacyAddress()));
-
-                            rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                                @Override
-                                public void onCheckedChanged(RadioGroup group, int checkedId) {
-                                    String addr;
-
-                                    if(checkedId == R.id.btn_street_addr) {
-                                        // 도로명 주소 선택
-                                        addr = addressInfo.getStreetAddress();
-                                    } else {
-                                        // 지번 주소 선택
-                                        addr = addressInfo.getLegacyAddress();
-                                    }
-
-                                    if(mOnAddressSelectedListener != null) {
-                                        mOnAddressSelectedListener.onSelected(addressInfo.getPostalCode(), addr);
-                                    }
-
-                                    initSearchMembers();
-                                    activity.removeCustomDialog(TAG_SELECT_ADDR);
-                                    activity.removeCustomDialog(TAG_SEARCH_ADDR);
-                                    activity.removeFragment(AddressSearchFragment.this);
-                                }
-                            });
-
-                            return customView;
-                        }
-                    }))
-                    .setShowCloseButton(true, null)
-                    .build();
-
-            return dialogItems;
-        }
+//        private DialogItems makeDialogItemAddressSelect(final Address addressInfo) {
+//            final BaseActivity activity = (BaseActivity) getActivity();
+//
+//            DialogItems dialogItems = new DialogItems.Builder(activity)
+//                    .setTitle(R.string.select_addr)
+//                    .setCustomViewInflater(new DialogCustomViewInflater(new AbstractDialogCustomViewInflater() {
+//                        @Override
+//                        public View inflateContentView() {
+//                            View customView = View.inflate(activity, R.layout.dialog_address_select_view, null);
+//
+//                            RadioGroup rg = (RadioGroup) customView.findViewById(R.id.rg_addr_select);
+//                            RadioButton btnStreetAddr = (RadioButton) rg.findViewById(R.id.btn_street_addr);
+//                            RadioButton btnJibunAddr = (RadioButton) rg.findViewById(R.id.btn_jibun_addr);
+//
+//                            btnStreetAddr.setText(String.format(activity.getString(R.string.street_addr_format), addressInfo.getStreetAddress()));
+//                            btnJibunAddr.setText(String.format(activity.getString(R.string.jibun_addr_format), addressInfo.getLegacyAddress()));
+//
+//                            rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//                                @Override
+//                                public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                                    String addr;
+//
+//                                    if(checkedId == R.id.btn_street_addr) {
+//                                        // 도로명 주소 선택
+//                                        addr = addressInfo.getStreetAddress();
+//                                    } else {
+//                                        // 지번 주소 선택
+//                                        addr = addressInfo.getLegacyAddress();
+//                                    }
+//
+//                                    if(mOnAddressSelectedListener != null) {
+//                                        mOnAddressSelectedListener.onSelected(addressInfo.getPostalCode(), addr);
+//                                    }
+//
+//                                    initSearchMembers();
+//                                    activity.removeCustomDialog(TAG_SELECT_ADDR);
+//                                    activity.removeCustomDialog(TAG_SEARCH_ADDR);
+//                                    activity.removeFragment(AddressSearchFragment.this);
+//                                }
+//                            });
+//
+//                            return customView;
+//                        }
+//                    }))
+//                    .setShowCloseButton(true, null)
+//                    .build();
+//
+//            return dialogItems;
+//        }
 
         public void setSearchKeyword(String searchKeyword) {
             mSearchKeyword = searchKeyword;

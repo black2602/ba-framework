@@ -17,11 +17,6 @@ public class DialogItems implements Parcelable {
     private String positiveButtonText;
     private String negativeButtonText;
     private String neutralButtonText;
-    private DialogCustomViewInflater dialogCustomViewInflater;
-    private AbstractDialogButtonClickListener positiveButtonClickListener;
-    private AbstractDialogButtonClickListener neutralButtonClickListener;
-    private AbstractDialogButtonClickListener negativeButtonClickListener;
-    private AbstractDialogButtonClickListener closeButtonClickListener;
     private boolean cancelable = true;        // 백키 취소가능 디폴트 값 true
     private boolean showCloseButton;
     private boolean dismissOnButtonClick = true;
@@ -39,11 +34,6 @@ public class DialogItems implements Parcelable {
         positiveButtonText = in.readString();
         negativeButtonText = in.readString();
         neutralButtonText = in.readString();
-        dialogCustomViewInflater = in.readParcelable(DialogCustomViewInflater.class.getClassLoader());
-        positiveButtonClickListener = in.readParcelable(AbstractDialogButtonClickListener.class.getClassLoader());
-        neutralButtonClickListener = in.readParcelable(AbstractDialogButtonClickListener.class.getClassLoader());
-        negativeButtonClickListener = in.readParcelable(AbstractDialogButtonClickListener.class.getClassLoader());
-        closeButtonClickListener = in.readParcelable(AbstractDialogButtonClickListener.class.getClassLoader());
         cancelable = in.readByte() != 0;
         showCloseButton = in.readByte() != 0;
         dismissOnButtonClick = in.readByte() != 0;
@@ -74,49 +64,25 @@ public class DialogItems implements Parcelable {
         return positiveButtonText;
     }
 
-    public void setPositiveButton(String positiveButtonText, AbstractDialogButtonClickListener positiveButtonClickListener) {
+    public void setPositiveButton(String positiveButtonText) {
         this.positiveButtonText = positiveButtonText;
-        this.positiveButtonClickListener = positiveButtonClickListener;
     }
 
     public String getNeutralButtonText() {
         return neutralButtonText;
     }
 
-    public void setNeutralButton(String neutralButtonText, AbstractDialogButtonClickListener neutralButtonClickListener) {
+    public void setNeutralButton(String neutralButtonText) {
         this.neutralButtonText = neutralButtonText;
-        this.neutralButtonClickListener = neutralButtonClickListener;
     }
 
     public String getNegativeButtonText() {
         return negativeButtonText;
     }
 
-    public void setNegativeButton(String negativeButtonText, AbstractDialogButtonClickListener negativeButtonClickListener) {
+    public void setNegativeButton(String negativeButtonText) {
         this.negativeButtonText = negativeButtonText;
-        this.negativeButtonClickListener = negativeButtonClickListener;
     }
-
-    public AbstractDialogButtonClickListener getPositiveButtonClickListener() {
-        return positiveButtonClickListener;
-    }
-
-    public AbstractDialogButtonClickListener getNeutralButtonClickListener() {
-        return neutralButtonClickListener;
-    }
-
-    public AbstractDialogButtonClickListener getNegativeButtonClickListener() {
-        return negativeButtonClickListener;
-    }
-
-    public DialogCustomViewInflater getCustomViewInflater() {
-        return dialogCustomViewInflater;
-    }
-
-    public void setDialogCustomViewInflater(DialogCustomViewInflater dialogCustomViewInflater) {
-        this.dialogCustomViewInflater = dialogCustomViewInflater;
-    }
-
 
     public boolean isCancelable() {
         return cancelable;
@@ -126,11 +92,9 @@ public class DialogItems implements Parcelable {
         this.cancelable = cancelable;
     }
 
-    public void setCloseButton(boolean showCloseButton, AbstractDialogButtonClickListener closeButtonClickListener) {
+    public void setCloseButton(boolean showCloseButton) {
         this.showCloseButton = showCloseButton;
-        this.closeButtonClickListener = closeButtonClickListener;
     }
-
 
     public boolean isShowCloseButton() {
         return showCloseButton;
@@ -138,10 +102,6 @@ public class DialogItems implements Parcelable {
 
     public int getTitleImageResId() {
         return titleImgResId;
-    }
-
-    public AbstractDialogButtonClickListener getCloseButtonClickListener() {
-        return closeButtonClickListener;
     }
 
     public boolean isShowTitle() {
@@ -186,11 +146,6 @@ public class DialogItems implements Parcelable {
         dest.writeString(this.positiveButtonText);
         dest.writeString(this.negativeButtonText);
         dest.writeString(this.neutralButtonText);
-        dest.writeParcelable(this.dialogCustomViewInflater, flags);
-        dest.writeParcelable(this.positiveButtonClickListener, flags);
-        dest.writeParcelable(this.neutralButtonClickListener, flags);
-        dest.writeParcelable(this.negativeButtonClickListener, flags);
-        dest.writeParcelable(this.closeButtonClickListener, flags);
         dest.writeByte((byte) (this.cancelable ? 1 : 0));
         dest.writeByte((byte) (this.showCloseButton ? 1 : 0));
         dest.writeByte((byte) (this.dismissOnButtonClick ? 1 : 0));
@@ -244,50 +199,38 @@ public class DialogItems implements Parcelable {
             return this;
         }
 
-        public Builder setPositiveButton(String positiveButtonText, DialogButtonClickListener positiveButtonClickListener) {
-            mDialogItems.setPositiveButton(positiveButtonText, positiveButtonClickListener != null ? positiveButtonClickListener.getDialogButtonClickListener() : null);
+        public Builder setPositiveButton(int positiveButtonTextResId) {
+            mDialogItems.setPositiveButton(mRes.getString(positiveButtonTextResId));
             return this;
         }
 
-        public Builder setPositiveButton(int positiveButtonTextResId, DialogButtonClickListener positiveButtonClickListener) {
-            mDialogItems.setPositiveButton(mRes.getString(positiveButtonTextResId), positiveButtonClickListener != null ? positiveButtonClickListener.getDialogButtonClickListener() : null);
+        public Builder setPositiveButton(String positiveButtonText) {
+            mDialogItems.setPositiveButton(positiveButtonText);
             return this;
         }
 
-        public Builder setNeutralButton(String neutralButtonText, DialogButtonClickListener neutralButtonClickListener) {
-            mDialogItems.setNeutralButton(neutralButtonText, neutralButtonClickListener != null ? neutralButtonClickListener.getDialogButtonClickListener() : null);
+        public Builder setNeutralButton(String neutralButtonText) {
+            mDialogItems.setNeutralButton(neutralButtonText);
             return this;
         }
 
-        public Builder setNeutralButton(int neutralButtonTextResId, DialogButtonClickListener neutralButtonClickListener) {
-            mDialogItems.setNeutralButton(mRes.getString(neutralButtonTextResId), neutralButtonClickListener != null ? neutralButtonClickListener.getDialogButtonClickListener() : null);
+        public Builder setNeutralButton(int neutralButtonTextResId) {
+            mDialogItems.setNeutralButton(mRes.getString(neutralButtonTextResId));
             return this;
         }
 
-        public Builder setNegativeButton(String negativeButtonText, DialogButtonClickListener negativeButtonClickListener) {
-            mDialogItems.setNegativeButton(negativeButtonText, negativeButtonClickListener != null ? negativeButtonClickListener.getDialogButtonClickListener() : null);
+        public Builder setNegativeButton(String negativeButtonText) {
+            mDialogItems.setNegativeButton(negativeButtonText);
             return this;
         }
 
-        public Builder setNegativeButton(int negativeButtonTextResId, DialogButtonClickListener negativeButtonClickListener) {
-            mDialogItems.setNegativeButton(mRes.getString(negativeButtonTextResId), negativeButtonClickListener != null ? negativeButtonClickListener.getDialogButtonClickListener() : null);
+        public Builder setNegativeButton(int negativeButtonTextResId) {
+            mDialogItems.setNegativeButton(mRes.getString(negativeButtonTextResId));
             return this;
         }
 
-        /**
-         *
-         * 기본 positive, negative, neutral 버튼 클릭시 팝업을 사라지게 할지 여부를 설정한다.<p>
-         * true : positive, negative, neutral 버튼 클릭시 팝업 사라짐<p>
-         * false : positive, negative, neutral 버튼 클릭시 팝업 사라지지 않음<p>
-         * 디폴트는 true
-         */
         public Builder setDismissOnButtonClick(boolean dismissOnButtonClick) {
             mDialogItems.setDismissOnButtonClick(dismissOnButtonClick);
-            return this;
-        }
-
-        public Builder setCustomViewInflater(DialogCustomViewInflater inflater) {
-            mDialogItems.setDialogCustomViewInflater(inflater);
             return this;
         }
 
@@ -296,8 +239,8 @@ public class DialogItems implements Parcelable {
             return this;
         }
 
-        public Builder setShowCloseButton(boolean showCloseButton, DialogButtonClickListener closeButtonClickListener) {
-            mDialogItems.setCloseButton(showCloseButton, closeButtonClickListener.getDialogButtonClickListener());
+        public Builder setShowCloseButton(boolean showCloseButton) {
+            mDialogItems.setCloseButton(showCloseButton);
             return this;
         }
 
@@ -309,9 +252,7 @@ public class DialogItems implements Parcelable {
         public DialogItems build() {
             return mDialogItems;
         }
-
     }
-
 
     private void setTitleImage(int titleImgResId) {
         this.titleImgResId = titleImgResId;

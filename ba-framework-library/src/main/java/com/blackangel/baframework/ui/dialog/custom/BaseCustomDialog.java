@@ -77,10 +77,10 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 		private boolean mbCancelable = true;
 		private boolean dismissOnButtonClick = true;
 
-		private DialogInterface.OnClickListener positiveButtonClickListener, negativeButtonClickListener,
+		private OnClickListener positiveButtonClickListener, negativeButtonClickListener,
 				neutralButtonClickListener;
 
-		private DialogInterface.OnClickListener mCloseClickListener;
+		private OnClickListener mCloseClickListener;
 
 
 		public Builder(Context context)
@@ -111,7 +111,7 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 		 * @return
 		 */
 		public Builder setMessage(int message) {
-			this.message = (String) context.getText(message);
+			this.message = context.getText(message);
 			return this;
 		}
 
@@ -189,7 +189,7 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 		 * @param listener
 		 * @return
 		 */
-		public Builder setPositiveButton(int positiveButtonText, DialogInterface.OnClickListener listener) {
+		public Builder setPositiveButton(int positiveButtonText, OnClickListener listener) {
 			this.positiveButtonText = (String) context.getText(positiveButtonText);
 			this.positiveButtonClickListener = listener;
 			return this;
@@ -202,7 +202,7 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 		 * @param listener
 		 * @return
 		 */
-		public Builder setPositiveButton(String positiveButtonText, DialogInterface.OnClickListener listener) {
+		public Builder setPositiveButton(String positiveButtonText, OnClickListener listener) {
 			this.positiveButtonText = positiveButtonText;
 			this.positiveButtonClickListener = listener;
 			return this;
@@ -215,7 +215,7 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 		 * @param listener
 		 * @return
 		 */
-		public Builder setNeutralButton(int neutralButtonText, DialogInterface.OnClickListener listener) {
+		public Builder setNeutralButton(int neutralButtonText, OnClickListener listener) {
 			this.neutralButtonText = (String) context.getText(neutralButtonText);
 			this.neutralButtonClickListener = listener;
 			return this;
@@ -228,7 +228,7 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 		 * @param listener
 		 * @return
 		 */
-		public Builder setNeutralButton(String neutralButtonText, DialogInterface.OnClickListener listener) {
+		public Builder setNeutralButton(String neutralButtonText, OnClickListener listener) {
 			this.neutralButtonText = neutralButtonText;
 			this.neutralButtonClickListener = listener;
 			return this;
@@ -241,7 +241,7 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 		 * @param listener
 		 * @return
 		 */
-		public Builder setNegativeButton(int negativeButtonText, DialogInterface.OnClickListener listener) {
+		public Builder setNegativeButton(int negativeButtonText, OnClickListener listener) {
 			this.negativeButtonText = (String) context.getText(negativeButtonText);
 			this.negativeButtonClickListener = listener;
 			return this;
@@ -254,7 +254,7 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 		 * @param listener
 		 * @return
 		 */
-		public Builder setNegativeButton(String negativeButtonText, DialogInterface.OnClickListener listener) {
+		public Builder setNegativeButton(String negativeButtonText, OnClickListener listener) {
 			this.negativeButtonText = negativeButtonText;
 			this.negativeButtonClickListener = listener;
 			return this;
@@ -265,19 +265,15 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 			return this;
 		}
 
-		public Builder setCloseButton(boolean show, DialogInterface.OnClickListener listener) {
+		public Builder setCloseButton(boolean show, OnClickListener listener) {
 			this.showCloseBtn = show;
 			this.mCloseClickListener = listener;
 
 			return this;
 		}
 
-		/**
-		 * Create the custom dialog
-		 */
 		public BaseCustomDialog create() {
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			// instantiate the dialog with the custom Theme
 
 			BaseCustomDialog dialog = null;
 
@@ -287,12 +283,12 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 				layout = inflater.inflate(R.layout.base_custom_dialog_full, null);
 
 			} else if (displayOrientation == DisplayOrientation.BOTTOM) {
-				dialog = new BaseCustomDialog(context, R.style.CustomDialog_Bottom);
+				// Bottom에 위치하는 Dialog 스타일은 킷캣 이하와 롤리팝 이상에서 동작이 다르므로 v21 폴더에 이분화하여 처리함
+				dialog = new BaseCustomDialog(context, R.style.CustomDialog_Bottom_FullWidth);
 				layout = inflater.inflate(R.layout.base_custom_dialog_bottom, null);
 
 				Window window = dialog.getWindow();
 				WindowManager.LayoutParams wlp = window.getAttributes();
-
 				wlp.gravity = Gravity.BOTTOM;
 				wlp.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
 				window.setAttributes(wlp);
@@ -306,7 +302,6 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 
 			dialog.addContentView(layout, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
-			// set the dialog title
 			if (title != null) {
 				((TextView) layout.findViewById(R.id.title)).setText(title);
 			}
@@ -314,7 +309,7 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 				layout.findViewById(R.id.layout_title).setVisibility(View.GONE);
 			}
 			else {
-				ImageView titleIcon = ((ImageView) layout.findViewById(R.id.title_img));
+				ImageView titleIcon = layout.findViewById(R.id.title_img);
 				titleIcon.setVisibility(View.VISIBLE);
 			}
 
@@ -322,7 +317,7 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 			if(showCloseBtn) {
 				ViewGroup btnClose = (ViewGroup) layout.findViewById(R.id.btn_close).getParent();
 				btnClose.setVisibility(View.VISIBLE);
-				final BaseCustomDialog finalDialog3 = dialog;
+				BaseCustomDialog finalDialog3 = dialog;
 				btnClose.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						if (mCloseClickListener != null) {
@@ -334,97 +329,117 @@ public class BaseCustomDialog extends Dialog implements Serializable {
 				});
 			}
 
-			ViewGroup sb_dialog_button_layout = (ViewGroup) layout.findViewById(R.id.layout_btns1);
+			ViewGroup dialogButtonLayout = layout.findViewById(R.id.layout_btns1);
 
 			if (positiveButtonText == null && neutralButtonText == null && negativeButtonText == null) {
 				// 버튼 없을 때 버튼 레이아웃 숨김
-				sb_dialog_button_layout.setVisibility(View.GONE);
+				dialogButtonLayout.setVisibility(View.GONE);
 
 			} else {
 				if(positiveButtonText != null && neutralButtonText != null && negativeButtonText != null) {
 					// 세개 버튼이 모두 있을 때는 layout2 를 씀
-					sb_dialog_button_layout.setVisibility(View.GONE);
+					dialogButtonLayout.setVisibility(View.GONE);
 				} else {
 					// 세개 버튼 중 하나라도 없으면 layout1 을 씀
-					sb_dialog_button_layout.setVisibility(View.VISIBLE);
+					dialogButtonLayout.setVisibility(View.VISIBLE);
 				}
 			}
+
+			int buttonCnt = 0;
+			Button positiveBtn = layout.findViewById(R.id.dialog_button3);
+			Button neturalBtn = layout.findViewById(R.id.dialog_button2);
+			Button negativeBtn = layout.findViewById(R.id.dialog_button1);
 
 			// set the confirm button
 			if (positiveButtonText != null) {
-				((Button) layout.findViewById(R.id.dialog_button3)).setText(positiveButtonText);
-				if (positiveButtonClickListener != null) {
-					final BaseCustomDialog finalDialog = dialog;
-					((Button) layout.findViewById(R.id.dialog_button3))
-							.setOnClickListener(new View.OnClickListener() {
-								public void onClick(View v) {
-									positiveButtonClickListener.onClick(finalDialog, DialogInterface.BUTTON_POSITIVE);
-									MyLog.i("dismissOnButtonClick = " + dismissOnButtonClick);
-									if(dismissOnButtonClick)
-										finalDialog.dismiss();
-								}
-							});
-				}
+				positiveBtn.setText(positiveButtonText);
+				final BaseCustomDialog finalDialog = dialog;
+				positiveBtn.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						if(positiveButtonClickListener != null)
+							positiveButtonClickListener.onClick(finalDialog, DialogInterface.BUTTON_POSITIVE);
 
+						MyLog.i("dismissOnButtonClick = " + dismissOnButtonClick);
+						if(dismissOnButtonClick)
+							finalDialog.dismiss();
+					}
+				});
+				buttonCnt++;
 			}
 			else {
 				// if no confirm button just set the visibility to GONE
-				layout.findViewById(R.id.dialog_button3).setVisibility(View.GONE);
+				positiveBtn.setVisibility(View.GONE);
 			}
 
 			// set the confirm button
 			if (neutralButtonText != null) {
-				((Button) layout.findViewById(R.id.dialog_button2)).setText(neutralButtonText);
-				if (neutralButtonClickListener != null) {
-					final BaseCustomDialog finalDialog1 = dialog;
-					((Button) layout.findViewById(R.id.dialog_button2))
-							.setOnClickListener(new View.OnClickListener() {
-								public void onClick(View v) {
-									neutralButtonClickListener.onClick(finalDialog1, DialogInterface.BUTTON_NEUTRAL);
-									MyLog.i("dismissOnButtonClick = " + dismissOnButtonClick);
-									if(dismissOnButtonClick)
-										finalDialog1.dismiss();
-								}
-							});
-				}
+				neturalBtn.setText(neutralButtonText);
+
+				final BaseCustomDialog finalDialog1 = dialog;
+				neturalBtn.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						if (neutralButtonClickListener != null)
+							neutralButtonClickListener.onClick(finalDialog1, DialogInterface.BUTTON_NEUTRAL);
+						MyLog.i("dismissOnButtonClick = " + dismissOnButtonClick);
+						if(dismissOnButtonClick)
+							finalDialog1.dismiss();
+					}
+				});
+				buttonCnt++;
 			}
 			else {
 				// if no confirm button just set the visibility to GONE
-				layout.findViewById(R.id.dialog_button2).setVisibility(View.GONE);
+				neturalBtn.setVisibility(View.GONE);
 			}
 
 			// set the cancel button
 			if (negativeButtonText != null) {
-				((Button) layout.findViewById(R.id.dialog_button1)).setText(negativeButtonText);
-				if (negativeButtonClickListener != null) {
-					final BaseCustomDialog finalDialog2 = dialog;
-					((Button) layout.findViewById(R.id.dialog_button1))
-							.setOnClickListener(new View.OnClickListener() {
-								public void onClick(View v) {
-									negativeButtonClickListener.onClick(finalDialog2, DialogInterface.BUTTON_NEGATIVE);
-									MyLog.i("dismissOnButtonClick = " + dismissOnButtonClick);
-									if(dismissOnButtonClick)
-										finalDialog2.dismiss();
-								}
-							});
-				}
+				negativeBtn.setText(negativeButtonText);
+
+				final BaseCustomDialog finalDialog2 = dialog;
+				negativeBtn.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						if (negativeButtonClickListener != null)
+							negativeButtonClickListener.onClick(finalDialog2, DialogInterface.BUTTON_NEGATIVE);
+						MyLog.i("dismissOnButtonClick = " + dismissOnButtonClick);
+						if(dismissOnButtonClick)
+							finalDialog2.dismiss();
+					}
+				});
+				buttonCnt++;
 			}
 			else {
 				// if no confirm button just set the visibility to GONE
-				layout.findViewById(R.id.dialog_button1).setVisibility(View.GONE);
+				negativeBtn.setVisibility(View.GONE);
+			}
+
+			if(buttonCnt > 1) {
+				LinearLayout.LayoutParams positiveBtnLayoutParams = (LinearLayout.LayoutParams) positiveBtn.getLayoutParams();
+				LinearLayout.LayoutParams neturalBtnLayoutParams = (LinearLayout.LayoutParams) neturalBtn.getLayoutParams();
+				LinearLayout.LayoutParams negativeBtnLayoutParams = (LinearLayout.LayoutParams) negativeBtn.getLayoutParams();
+
+				positiveBtnLayoutParams.width = 0;
+				positiveBtnLayoutParams.weight = 1;
+				neturalBtnLayoutParams.width = 0;
+				neturalBtnLayoutParams.weight = 1;
+				negativeBtnLayoutParams.width = 0;
+				negativeBtnLayoutParams.weight = 1;
+
+				positiveBtn.setLayoutParams(positiveBtnLayoutParams);
+				neturalBtn.setLayoutParams(neturalBtnLayoutParams);
+				negativeBtn.setLayoutParams(negativeBtnLayoutParams);
 			}
 
 			// set the content message
 			if (message != null) {
 				((TextView) layout.findViewById(R.id.content)).setText(message);
 
-			}
-
-			else if (contentView != null) {
+			} else if (contentView != null) {
 				// if no message set
 				// add the contentView to the dialog body
-				((LinearLayout) layout.findViewById(R.id.layout_content)).removeAllViews();
-				((LinearLayout) layout.findViewById(R.id.layout_content)).addView(contentView, new LayoutParams(
+				ViewGroup layoutContents = ((LinearLayout) layout.findViewById(R.id.layout_content));
+				layoutContents.removeAllViews();
+				layoutContents.addView(contentView, new LayoutParams(
 						LayoutParams.MATCH_PARENT, contentViewHeight > 0 ? contentViewHeight : LayoutParams.WRAP_CONTENT));
 			}
 

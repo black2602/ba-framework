@@ -7,6 +7,4 @@ package com.blackangel.baframework.network;
 public interface ApiProgressListener {
     void onStartApi(String progressMsg);
     void onFinishApi();
-    void onGlobalErrorResponse(int errCode, String errMessage, Object... extras);
-    boolean isGlobalError(int errCode);
 }

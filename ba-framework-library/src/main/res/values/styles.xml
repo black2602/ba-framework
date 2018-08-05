@@ -124,6 +124,22 @@
         <item name="android:textColorPrimary">@android:color/black</item>
     </style>
 
+    <style name="CustomDialog.Bottom.FullWidth" parent="CustomDialog" >
+        <item name="android:windowBackground">@drawable/shape_main_color_stroke_white_round_box</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/MainButton</item>
+        <item name="android:bottomBright">@android:color/white</item>
+        <item name="android:bottomDark">@android:color/white</item>
+        <item name="android:bottomMedium">@android:color/white</item>
+        <item name="android:centerBright">@android:color/white</item>
+        <item name="android:centerDark">@android:color/white</item>
+        <item name="android:centerMedium">@android:color/white</item>
+        <item name="android:fullBright">@color/colorPrimary</item>
+        <item name="android:fullDark">@color/colorPrimary</item>
+        <item name="android:topDark">@color/colorPrimary</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+    </style>
+
     <style name="CustomDialog.Title" parent="android:Widget.TextView">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@android:color/white</item>
@@ -205,6 +221,18 @@
         <item name="android:textColor">@drawable/selector_main_edittext_color</item>
         <item name="android:paddingTop">2dp</item>
         <item name="android:paddingBottom">2dp</item>
+    </style>
+
+    <style name="MainEditText.LabelInputView" parent="MainEditText">
+        <item name="android:textColorHint">@color/gray_text_color</item>
+        <!--<item name="android:background">@android:color/transparent</item>-->
+    </style>
+
+    <style name="MainButton.NoBackground" parent="MainButton">
+        <item name="android:background">@null</item>
+        <item name="android:foreground">@null</item>
+        <item name="android:textColor">@drawable/selector_main_button_no_bg_text</item>
+        <item name="android:padding">2dp</item>
     </style>
 
 </resources>

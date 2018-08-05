@@ -11,14 +11,13 @@ import com.blackangel.baframework.preference.MyPreferenceManager;
 public abstract class BaApplication extends Application {
     public static boolean sDebug;
 
-    private static BaApplication instance;
+    private static BaApplication sApp;
     public static MyPreferenceManager sMyPreferenceManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
-        instance = this;
+        sApp = this;
 
         ApiInfo.APP_SERVER_URL = getAppServerUrl();
     }
@@ -26,12 +25,12 @@ public abstract class BaApplication extends Application {
     protected abstract String getAppServerUrl();
 
     public synchronized static BaApplication getInstance() {
-        return instance;
+        return sApp;
     }
 
     public static MyPreferenceManager getPreferenceManager() {
         if(sMyPreferenceManager == null)
-            sMyPreferenceManager = MyPreferenceManager.getInstance(instance);
+            sMyPreferenceManager = MyPreferenceManager.getInstance(sApp);
 
         return sMyPreferenceManager;
     }
