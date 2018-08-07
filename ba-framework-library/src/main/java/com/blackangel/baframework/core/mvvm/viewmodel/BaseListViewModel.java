@@ -6,10 +6,10 @@ import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 
 import com.blackangel.baframework.BR;
-import com.blackangel.baframework.core.model.ApiModelLoadError;
+import com.blackangel.baframework.core.model.ModelLoadError;
 import com.blackangel.baframework.core.model.ListModel;
 import com.blackangel.baframework.logger.MyLog;
-import com.blackangel.baframework.network.listener.ListModelResultCallback;
+import com.blackangel.baframework.network.listener.ListModelGetResultCallback;
 
 
 public abstract class BaseListViewModel<T> extends BaseViewModel {
@@ -127,7 +127,7 @@ public abstract class BaseListViewModel<T> extends BaseViewModel {
         }
 
         setListDataLoading(true);
-        listDataSource.getListDataAsync(page, pageSize, new ListModelResultCallback<T>() {
+        listDataSource.getListDataAsync(page, pageSize, new ListModelGetResultCallback<T>() {
             @Override
             public void onSuccess(ListModel<T> response) {
                 setProgressBarVisibility(false);
@@ -139,11 +139,11 @@ public abstract class BaseListViewModel<T> extends BaseViewModel {
             }
 
             @Override
-            public void onFail(String url, int errCode, String message, Throwable throwable) {
+            public void onFail(ModelLoadError modelLoadError) {
                 setProgressBarVisibility(false);
                 setListDataLoading(false);
                 setListDataLoaded(false);
-                setModelLoadError(new ApiModelLoadError(url, errCode, message, throwable));
+                setModelLoadError(modelLoadError);
                 if(getCurPage() > 1) {
                     setLoadMoreErrorVisible(true);
                 }

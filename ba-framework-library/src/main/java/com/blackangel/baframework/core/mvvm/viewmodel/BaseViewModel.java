@@ -7,9 +7,9 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 
 import com.blackangel.baframework.BR;
-import com.blackangel.baframework.core.model.ApiModelLoadError;
+import com.blackangel.baframework.core.model.ModelLoadError;
 import com.blackangel.baframework.core.model.BaseError;
-import com.blackangel.baframework.network.listener.ModelResultCallback;
+import com.blackangel.baframework.network.listener.ModelGetResultCallback;
 
 
 /**
@@ -20,12 +20,12 @@ public abstract class BaseViewModel<T> extends BaseObservable {
 
     private ObservableField<T> model = new ObservableField<>();
     private ObservableBoolean progressBarVisibility = new ObservableBoolean();
-    private ObservableField<ApiModelLoadError> modelLoadError = new ObservableField<>();
+    private ObservableField<ModelLoadError> modelLoadError = new ObservableField<>();
     private ObservableField<BaseError> globalError = new ObservableField<>();  // 네트워크 에러 같은 공통으로 처리할 에러
 
     // 기타 필요한 속성 오브젝트를 저장할 맵
     private ObservableArrayMap<Integer, Object> etcProperties = new ObservableArrayMap<>();
-    private ObservableArrayMap<Integer, ApiModelLoadError> etcPropertiesErrors = new ObservableArrayMap<>();
+    private ObservableArrayMap<Integer, ModelLoadError> etcPropertiesErrors = new ObservableArrayMap<>();
 
     private DataSource<T> dataSource;
 
@@ -46,7 +46,7 @@ public abstract class BaseViewModel<T> extends BaseObservable {
     }
 
     @Bindable
-    public ApiModelLoadError getModelLoadError() {
+    public ModelLoadError getModelLoadError() {
         return modelLoadError.get();
     }
 
@@ -70,8 +70,8 @@ public abstract class BaseViewModel<T> extends BaseObservable {
         notifyPropertyChanged(BR.progressBarVisibility);
     }
 
-    protected void setModelLoadError(ApiModelLoadError apiModelLoadError) {
-        this.modelLoadError.set(apiModelLoadError);
+    protected void setModelLoadError(ModelLoadError modelLoadError) {
+        this.modelLoadError.set(modelLoadError);
         notifyPropertyChanged(BR.modelLoadError);
     }
 
@@ -93,7 +93,7 @@ public abstract class BaseViewModel<T> extends BaseObservable {
             setProgressBarVisibility(true);
         }
 
-        dataSource.getDataAsync(new ModelResultCallback<T>() {
+        dataSource.getDataAsync(new ModelGetResultCallback<T>() {
                     @Override
                     public void onSuccess(T response) {
                         setProgressBarVisibility(false);
@@ -101,9 +101,9 @@ public abstract class BaseViewModel<T> extends BaseObservable {
                     }
 
                     @Override
-                    public void onFail(String url, int errCode, String message, Throwable throwable) {
+                    public void onFail(ModelLoadError modelLoadError) {
                         setProgressBarVisibility(false);
-                        setModelLoadError(new ApiModelLoadError(url, errCode, message, throwable));
+                        setModelLoadError(modelLoadError);
                     }
                 }
         );
@@ -116,12 +116,12 @@ public abstract class BaseViewModel<T> extends BaseObservable {
      * @param dataSource
      * @param <T>
      */
-    public <T> void loadWithAnotherRequestApi(int propertyId, boolean showProgress, DataSource<T> dataSource) {
+    public <T> void loadAnotherRequestApi(int propertyId, boolean showProgress, DataSource<T> dataSource) {
         if (showProgress) {
             setProgressBarVisibility(true);
         }
 
-        dataSource.getDataAsync(new ModelResultCallback<T>() {
+        dataSource.getDataAsync(new ModelGetResultCallback<T>() {
             @Override
             public void onSuccess(T response) {
                 setProgressBarVisibility(false);
@@ -130,10 +130,10 @@ public abstract class BaseViewModel<T> extends BaseObservable {
             }
 
             @Override
-            public void onFail(String url, int errCode, String message, Throwable throwable) {
+            public void onFail(ModelLoadError modelLoadError) {
                 setProgressBarVisibility(false);
                 removeEtcPropertyValue(propertyId);
-                addEtcPropertyLoadError(propertyId, new ApiModelLoadError(url, errCode, message, throwable));
+                addEtcPropertyLoadError(propertyId, modelLoadError);
             }
         });
     }
@@ -146,13 +146,63 @@ public abstract class BaseViewModel<T> extends BaseObservable {
         etcPropertiesErrors.remove(propertyId);
     }
 
-    private void addEtcPropertyLoadError(int propertyId, ApiModelLoadError apiModelLoadError) {
-        etcPropertiesErrors.put(propertyId, apiModelLoadError);
+    private void addEtcPropertyLoadError(int propertyId, ModelLoadError modelLoadError) {
+        etcPropertiesErrors.put(propertyId, modelLoadError);
         notifyPropertyChanged(propertyId);
     }
 
-    public Object getEtcPropertyValue(int key) {
-        return etcProperties.get(key);
+
+    public <T> T getEtcPropertyObjectValue(int key, Class<T> clazz) {
+        Object obj = etcProperties.get(key);
+        if(obj == null) {
+            return null;
+
+        } else if(obj.getClass() == clazz) {
+            return (T) obj;
+
+        } else {
+            throw new IllegalStateException("this etcProperty type is not " + clazz.getSimpleName());
+        }
+    }
+
+    public boolean getEtcPropertyBooleanValue(int key) {
+        Boolean value = getEtcPropertyObjectValue(key, Boolean.class);
+
+        if(value == null) {
+            return false;
+        } else {
+            return value;
+        }
+    }
+
+    public int getEtcPropertyIntValue(int key) {
+        Integer value = getEtcPropertyObjectValue(key, Integer.class);
+
+        if(value == null) {
+            return 0;
+        } else {
+            return value;
+        }
+    }
+
+    public long getEtcPropertyLongValue(int key) {
+        Long value = getEtcPropertyObjectValue(key, Long.class);
+
+        if(value == null) {
+            return 0L;
+        } else {
+            return value;
+        }
+    }
+
+    public double getEtcPropertyDoubleValue(int key) {
+        Double value = getEtcPropertyObjectValue(key, Double.class);
+
+        if(value == null) {
+            return 0d;
+        } else {
+            return value;
+        }
     }
 
     protected void addEtcProperty(int propertyId, Object object) {
@@ -164,7 +214,7 @@ public abstract class BaseViewModel<T> extends BaseObservable {
         return etcPropertiesErrors.get(propertyId) != null;
     }
 
-    public ApiModelLoadError getEtcPropertyError(int propertyId) {
+    public ModelLoadError getEtcPropertyError(int propertyId) {
         return etcPropertiesErrors.get(propertyId);
     }
 }

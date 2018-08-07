@@ -4,10 +4,10 @@ import android.databinding.Bindable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
 
-import com.blackangel.baframework.core.model.ApiModelLoadError;
+import com.blackangel.baframework.core.model.ModelLoadError;
 import com.blackangel.baframework.core.model.BaseError;
 import com.blackangel.baframework.core.model.ListModel;
-import com.blackangel.baframework.network.listener.ListModelResultCallback;
+import com.blackangel.baframework.network.listener.ListModelGetResultCallback;
 
 import java.util.Arrays;
 import java.util.List;
@@ -79,7 +79,7 @@ public abstract class MultiListViewModel<T> extends BaseListViewModel<T> impleme
     public abstract ListModel<T> mergeAllIndividualLoadedModels();
 
     @Override
-    public void getListDataAsync(int page, int pageSize, ListModelResultCallback<T> listModelResultCallback) {
+    public void getListDataAsync(int page, int pageSize, ListModelGetResultCallback<T> apiListModelGetResultCallback) {
         for (BaseListViewModel baseListViewModel : childListViewModels) {
             baseListViewModel.loadListAsync(false, page, pageSize);
         }
@@ -109,7 +109,7 @@ public abstract class MultiListViewModel<T> extends BaseListViewModel<T> impleme
         }
 
         @Override
-        protected void handleModelLoadError(int propertyId, ApiModelLoadError modelLoadError) {
+        protected void handleModelLoadError(int propertyId, ModelLoadError modelLoadError) {
             // 각 리스트 뷰모델에서 모델 로드중 에러 발생시, 동일한 종류의 에러에 대해서는 패스하도록
             if (getModelLoadError() == null || !getModelLoadError().equals(modelLoadError)) {
                 setModelLoadError(modelLoadError);

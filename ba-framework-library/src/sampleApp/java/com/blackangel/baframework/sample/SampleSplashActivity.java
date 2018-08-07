@@ -19,12 +19,23 @@ public class SampleSplashActivity extends BaseSplashActivity {
     }
 
     @Override
+    protected void goIntro() {
+        startActivity(SampleMainActivity.class);
+        finish();
+    }
+
+    @Override
     protected void configPush() {
         MyLog.i();
     }
 
     @Override
-    protected void onSplashEnd() {
+    protected boolean isNeedShowIntro() {
+        return false;
+    }
+
+    @Override
+    protected void doAfterSplashSkipIntro() {
         startActivity(SampleMainActivity.class);
         finish();
     }

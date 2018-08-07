@@ -1,7 +1,7 @@
 package com.blackangel.baframework.core.mvvm.viewmodel;
 
 
-import com.blackangel.baframework.network.listener.ListModelResultCallback;
+import com.blackangel.baframework.network.listener.ListModelGetResultCallback;
 
 /**
  * Created by kimjeonghun on 2018. 7. 8..
@@ -16,7 +16,7 @@ public interface ListDataSource<T> {
      *
      * @param page                      가져올 페이지
      * @param pageSize                  한페이지에 들어갈 아이템 사이즈
-     * @param listModelResultCallback   리스트 모델이 로드될 때 호출할 콜백
+     * @param apiListModelGetResultCallback   리스트 모델이 로드될 때 호출할 콜백
      */
-    void getListDataAsync(int page, int pageSize, ListModelResultCallback<T> listModelResultCallback);
+    void getListDataAsync(int page, int pageSize, ListModelGetResultCallback<T> apiListModelGetResultCallback);
 }

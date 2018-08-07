@@ -2,7 +2,7 @@ package com.blackangel.baframework.core.mvvm.viewmodel;
 
 
 import com.blackangel.baframework.core.model.ListModel;
-import com.blackangel.baframework.network.listener.ListModelResultCallback;
+import com.blackangel.baframework.network.listener.ListModelGetResultCallback;
 import com.blackangel.baframework.network.retrofit.BaseRetrofitRunner;
 
 import retrofit2.Call;
@@ -24,7 +24,7 @@ public abstract class BaseListViewModelFromRemote<T> extends BaseListViewModel<T
     protected abstract Call<? extends ListModel<T>> createLoadApiCall(int page, int pageSize);
 
     @Override
-    public void getListDataAsync(int page, int pageSize, ListModelResultCallback<T> listModelResultCallback) {
+    public void getListDataAsync(int page, int pageSize, ListModelGetResultCallback<T> apiListModelGetResultCallback) {
         BaseRetrofitRunner.executeAsyncForList(
                 createLoadApiCall(page, pageSize),
                 (globalError, extras) -> {
@@ -32,6 +32,6 @@ public abstract class BaseListViewModelFromRemote<T> extends BaseListViewModel<T
                     setGlobalError(globalError);
                     setListDataLoaded(false);
                 },
-                listModelResultCallback);
+                apiListModelGetResultCallback);
     }
 }

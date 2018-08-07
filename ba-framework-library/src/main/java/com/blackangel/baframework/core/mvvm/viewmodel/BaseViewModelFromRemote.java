@@ -1,7 +1,7 @@
 package com.blackangel.baframework.core.mvvm.viewmodel;
 
 
-import com.blackangel.baframework.network.listener.ModelResultCallback;
+import com.blackangel.baframework.network.listener.ModelGetResultCallback;
 import com.blackangel.baframework.network.retrofit.BaseRetrofitRunner;
 
 import retrofit2.Call;
@@ -14,7 +14,7 @@ public abstract class BaseViewModelFromRemote<T> extends BaseViewModel<T> implem
     }
 
     @Override
-    public void getDataAsync(ModelResultCallback<T> modelResultCallback) {
+    public void getDataAsync(ModelGetResultCallback<T> modelResultCallback) {
         BaseRetrofitRunner.executeAsyncWithoutUi(
                 createLoadApiCall(),
                 (globalError, extras) -> {

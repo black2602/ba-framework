@@ -18,7 +18,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.blackangel.baframework.R;
-import com.blackangel.baframework.core.model.ApiModelLoadError;
+import com.blackangel.baframework.core.model.ModelLoadError;
 import com.blackangel.baframework.core.model.BaseError;
 import com.blackangel.baframework.core.mvvm.viewmodel.BaseListViewModel;
 import com.blackangel.baframework.core.mvvm.viewmodel.BaseListViewModelPropertyChangedCallback;
@@ -173,7 +173,7 @@ public abstract class BaseListFragmentMvvm<T> extends BaseFragment implements My
         }
 
         @Override
-        protected void handleModelLoadError(int propertyId, ApiModelLoadError modelLoadError) {
+        protected void handleModelLoadError(int propertyId, ModelLoadError modelLoadError) {
             if(mListViewModel.getCurPage() > 1) {
                 showAlertDialog(modelLoadError.getErrMessage());
                 showSnackBarErrorOnLoadMore();

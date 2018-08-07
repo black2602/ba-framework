@@ -1,7 +1,7 @@
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-boolean isSampleApp = false
+boolean isSampleApp = true
 
 if (isSampleApp){
     apply plugin: 'com.android.application'
@@ -14,14 +14,14 @@ Properties localProps = new Properties()
 localProps.load(new FileInputStream(file('../local.properties')))
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     useLibrary  'org.apache.http.legacy'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0.0"
 
@@ -42,6 +42,15 @@ android {
         }
     }
 
+    flavorDimensions "full"
+
+    productFlavors {
+        sampleApp {
+            dimension "full"
+            applicationIdSuffix ".sample"
+        }
+    }
+
     lintOptions {
         abortOnError false
     }
@@ -54,16 +63,16 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.2'
-    androidTestImplementation 'org.mockito:mockito-core:2.13.0'
-    androidTestImplementation 'org.mockito:mockito-android:2.13.0'
+    androidTestImplementation 'org.mockito:mockito-core:2.21.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.21.0'
     annotationProcessor 'com.android.databinding:compiler:3.0.1'        // databinding 사용시 BR 클래스 심볼 인식등에 문제가 있을때 해결책
-    implementation "com.android.support:design:26.1.0"
-    implementation "com.android.support:preference-v7:26.1.0"
+    implementation "com.android.support:design:27.1.1"
+    implementation "com.android.support:preference-v7:27.1.1"
     implementation 'org.apache.commons:commons-lang3:3.4'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.2.3'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.8.0'
-    implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.8.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.10.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'

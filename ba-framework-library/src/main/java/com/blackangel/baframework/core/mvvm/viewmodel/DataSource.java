@@ -1,7 +1,7 @@
 package com.blackangel.baframework.core.mvvm.viewmodel;
 
 
-import com.blackangel.baframework.network.listener.ModelResultCallback;
+import com.blackangel.baframework.network.listener.ModelGetResultCallback;
 
 /**
  * Created by kimjeonghun on 2018. 7. 8..
@@ -15,5 +15,5 @@ public interface DataSource<T> {
      *
      * @param modelResultCallback   모델이 로드될 때 호출할 콜백
      */
-    void getDataAsync(ModelResultCallback<T> modelResultCallback);
+    void getDataAsync(ModelGetResultCallback<T> modelResultCallback);
 }

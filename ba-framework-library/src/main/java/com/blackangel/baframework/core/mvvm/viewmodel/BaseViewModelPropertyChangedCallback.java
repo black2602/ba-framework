@@ -3,7 +3,7 @@ package com.blackangel.baframework.core.mvvm.viewmodel;
 import android.databinding.Observable;
 
 import com.blackangel.baframework.BR;
-import com.blackangel.baframework.core.model.ApiModelLoadError;
+import com.blackangel.baframework.core.model.ModelLoadError;
 import com.blackangel.baframework.core.model.BaseError;
 
 /**
@@ -21,7 +21,7 @@ public abstract class BaseViewModelPropertyChangedCallback extends Observable.On
                 handleGlobalError(globalError);
             }
             else if (propertyId == BR.modelLoadError) {
-                ApiModelLoadError modelLoadError = ((BaseViewModel) sender).getModelLoadError();
+                ModelLoadError modelLoadError = ((BaseViewModel) sender).getModelLoadError();
                 handleModelLoadError(BR.model, modelLoadError);
 
             } else if (propertyId == BR.progressBarVisibility) {
@@ -44,7 +44,7 @@ public abstract class BaseViewModelPropertyChangedCallback extends Observable.On
 
     protected abstract void handleProgressBarVisible(boolean progressBarVisible);
 
-    protected abstract void handleModelLoadError(int propertyId, ApiModelLoadError modelLoadError);
+    protected abstract void handleModelLoadError(int propertyId, ModelLoadError modelLoadError);
 
     protected abstract void handleGlobalError(BaseError globalError);
 

@@ -5,13 +5,14 @@ import android.support.annotation.Nullable;
 
 import com.blackangel.baframework.app.constants.ApiInfo;
 import com.blackangel.baframework.app.constants.AppErrorCode;
+import com.blackangel.baframework.core.model.ModelLoadError;
 import com.blackangel.baframework.core.model.BaseError;
 import com.blackangel.baframework.core.model.ListModel;
 import com.blackangel.baframework.logger.MyLog;
 import com.blackangel.baframework.network.ApiProgressListener;
 import com.blackangel.baframework.network.listener.GlobalErrorHandler;
-import com.blackangel.baframework.network.listener.ListModelResultCallback;
-import com.blackangel.baframework.network.listener.ModelResultCallback;
+import com.blackangel.baframework.network.listener.ListModelGetResultCallback;
+import com.blackangel.baframework.network.listener.ModelGetResultCallback;
 import com.blackangel.baframework.util.StringUtil;
 import com.google.gson.JsonSyntaxException;
 
@@ -58,7 +59,7 @@ public class BaseRetrofitRunner {
     public static <T> void executeAsync(@Nullable final GlobalErrorHandler globalErrorHandler,
                                         final boolean showProgress,
                                         Call<T> call,
-                                        final ModelResultCallback<T> modelResultCallback) {
+                                        final ModelGetResultCallback<T> modelResultCallback) {
 
         call.enqueue(new Callback<T>() {
             @Override
@@ -89,7 +90,8 @@ public class BaseRetrofitRunner {
                     } catch (JsonSyntaxException | NullPointerException e) {
                         e.printStackTrace();
                         errMessage = e.getMessage();
-                        modelResultCallback.onFail(call.request().url().toString(), errCode, errMessage, new Throwable(errMessage));
+                        modelResultCallback.onFail(new ModelLoadError(
+                                call.request().url().toString(), errCode, errMessage, new Throwable(errMessage)));
                     }
                 }
             }
@@ -107,7 +109,7 @@ public class BaseRetrofitRunner {
                                                     final boolean showProgress,
                                                     Call<T> call,
                                                     GlobalErrorHandler globalErrorHandler,
-                                                    final ModelResultCallback<T> modelResultCallback) {
+                                                    final ModelGetResultCallback<T> modelResultCallback) {
         if(showProgress)
             apiProgressListener.onStartApi(null);
 
@@ -145,7 +147,8 @@ public class BaseRetrofitRunner {
                     } catch (JsonSyntaxException | NullPointerException e) {
                         e.printStackTrace();
                         errMessage = e.getMessage();
-                        modelResultCallback.onFail(call.request().url().toString(), errCode, errMessage, new Throwable(errMessage));
+                        modelResultCallback.onFail(
+                                new ModelLoadError(call.request().url().toString(), errCode, errMessage, new Throwable(errMessage)));
                     }
                 }
             }
@@ -165,7 +168,7 @@ public class BaseRetrofitRunner {
     public static <T, LM extends ListModel<T>> void executeAsyncForList(
             Call<LM> call,
             @Nullable final GlobalErrorHandler globalErrorHandler,
-            final ListModelResultCallback<T> apiModelResultListener) {
+            final ListModelGetResultCallback<T> apiModelResultListener) {
 
         call.enqueue(new Callback<LM>() {
             @Override
@@ -195,7 +198,8 @@ public class BaseRetrofitRunner {
                     } catch (JsonSyntaxException | NullPointerException e) {
                         e.printStackTrace();
                         errMessage = e.getMessage();
-                        apiModelResultListener.onFail(call.request().url().toString(), errCode, errMessage, new Throwable(errMessage));
+                        apiModelResultListener.onFail(
+                                new ModelLoadError(call.request().url().toString(), errCode, errMessage, new Throwable(errMessage)));
                     }
                 }
             }
@@ -211,7 +215,7 @@ public class BaseRetrofitRunner {
 
     private static void handleApiCallFailture(String requestUrl, Throwable t,
                                               GlobalErrorHandler globalErrorHandler,
-                                              ModelResultCallback modelResultCallback) {
+                                              ModelGetResultCallback modelResultCallback) {
 
         MyLog.i("requestUrl = " + requestUrl + ", exception = " + t.getClass().getSimpleName() + ", apiGlobalErroHandler = " + globalErrorHandler);
         if(t instanceof IOException) {
@@ -223,14 +227,14 @@ public class BaseRetrofitRunner {
             }
 
         } else {
-            modelResultCallback.onFail(requestUrl,
-                    AppErrorCode.ERROR_CODE_UNKNOWN, t.getMessage(), t);
+            modelResultCallback.onFail(new ModelLoadError(requestUrl,
+                    AppErrorCode.ERROR_CODE_UNKNOWN, t.getMessage(), t));
         }
     }
 
     private static void handleBusinessError(String requestUrl, int errResponseCode, String errBodyString,
                                             GlobalErrorHandler globalErrorHandler,
-                                            ModelResultCallback modelResultCallback) {
+                                            ModelGetResultCallback modelResultCallback) {
 
         if(sBusinessErrorHandler == null) {
             MyLog.w("sBusinessErrorHandler is null");
@@ -244,7 +248,7 @@ public class BaseRetrofitRunner {
     public static <T> void executeAsyncWithoutUi(
             Call<T> call,
             GlobalErrorHandler globalErrorHandler,
-            final ModelResultCallback<T> modelResultCallback) {
+            final ModelGetResultCallback<T> modelResultCallback) {
         executeAsync(globalErrorHandler, false, call, modelResultCallback);
     }
 
@@ -254,7 +258,7 @@ public class BaseRetrofitRunner {
      */
     public interface BusinessErrorHandler {
         void handleBusinessError(String requestUrl, int errCode, String errBodyString,
-                                 GlobalErrorHandler globalErrorHandler, ModelResultCallback modelResultCallback);
+                                 GlobalErrorHandler globalErrorHandler, ModelGetResultCallback modelResultCallback);
     }
 
     public interface ApiModelResultListener<T> {
